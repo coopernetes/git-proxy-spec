@@ -1,14 +1,11 @@
 # Identity Resolution
 
-Part of the Policy-Enforcing Git Proxy specification (working draft).
 Applies to implementations claiming **Class A**. Conformance keywords per
 BCP 14 (`00-overview.md`). Requirement IDs: `ID-n`.
 
 Establishes whose action a push is, so that authorization (LC-8),
 attribution (LC-5, LC-6), and scoped decisions (`03` DF-10) rest on an
 identity that cannot be trivially forged.
-
----
 
 ## 1. Two kinds of identity
 
@@ -98,8 +95,7 @@ permitted where the upstream cannot support per-client credentials.
 **ID-8** — In this mode the locally-issued credential is the identity
 anchor; ID-1 (a presented name is never trusted) and ID-2 (identity is
 anchored to the credential) apply unchanged. The internal attribution
-guarantee is not weakened — it is the upstream's view of the actor that
-degrades, not the intermediary's.
+guarantee holds; only the upstream's view of the actor degrades.
 
 **ID-9** — Every operation an intermediary performs under an
 intermediary-controlled identity on behalf of a pusher MUST record, on the
@@ -126,7 +122,7 @@ authorization weight. Commit author and committer are labels attached to
 content; git neither authenticates them nor prevents one person from
 writing another's name. Resting an authorization or approval decision on
 commit metadata would let any client assert any identity by editing a
-commit. Resting it on the resolved pusher does not.
+commit.
 
 ## 6. Open issues
 

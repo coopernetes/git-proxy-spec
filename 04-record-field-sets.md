@@ -1,11 +1,8 @@
 # Record Field Sets
 
-Part of the Policy-Enforcing Git Proxy specification (working draft).
 Applies to implementations claiming **Class A**. Conformance keywords per
 BCP 14 (`00-overview.md`). Requirement IDs: `PR-n` (push record), `AU-n`
 (audit view), `FR-n` (fetch record).
-
----
 
 ## 1. Model: one record, two views
 
@@ -15,11 +12,11 @@ state. It is the unit of storage, of API access, and of review.
 
 **Audit view.** The reconstruction that `02` LC-10 requires: for any
 submission, the ordered sequence of state transitions with their times,
-actors, and triggers. The audit view is **normative as a view, not as a
-table**: an implementation MAY store transitions as an explicit event
-log, or MAY derive the view from evidence embedded in the push record
-(step timestamps, attestations, terminal markers), provided the
-derivation is total. There is no requirement for a second stored object.
+actors, and triggers. The audit view is normative as a view. An
+implementation MAY store transitions as an explicit event log, or MAY
+derive the view from evidence embedded in the push record (step
+timestamps, attestations, terminal markers), provided the derivation is
+total. No second stored object is required.
 
 **Fetch operation record.** Fetch has no lifecycle — disposition is
 inline allow/deny (`02` scope note). Its record is therefore flat: one
@@ -31,13 +28,13 @@ operation, one decision, no states.
 submission, at least the fields marked MUST below, and MUST be able to
 return them through its policy/audit interface.
 
-Fields are normative as **reportable content**, not as storage columns:
-an implementation MAY store a field directly or derive it at query time
-(for example, by joining a referenced provider record), provided the
-derivation is deterministic and **stable for the life of the record** —
-derivation through configuration that can be edited after the record is
-written does not qualify unless the referenced configuration is
-immutable or versioned.
+Fields are normative as reportable content — what the policy/audit
+interface can return. An implementation MAY store a field directly or
+derive it at query time (for example, by joining a referenced provider
+record), provided the derivation is deterministic and stable for the life
+of the record. Derivation through configuration that can be edited after
+the record is written does not qualify unless the referenced configuration
+is immutable or versioned.
 
 ### 2.1 Submission identity and context
 
@@ -87,8 +84,8 @@ immutable or versioned.
 | `forwardedAt` | MUST on `forwarded` | Terminal transition time for the audit view |
 
 **PR-2** — Attestation content shape (map vs. list, question wording) is
-non-normative; what is normative is that each configured question and the
-reviewer's response to it are individually recoverable.
+non-normative. Each configured question and the reviewer's response to it
+MUST be individually recoverable.
 
 **PR-3** — Current implementations record one (ref, old, new) triple per
 submission. Multi-ref pushes are an open issue (§5).

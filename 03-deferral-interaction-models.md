@@ -1,14 +1,9 @@
 # Deferral Interaction Models
 
-Part of the Policy-Enforcing Git Proxy specification (working draft).
-Resolves the statelessness question raised in `01` §5.6: Git-over-HTTP is
-stateless by design, and a held-for-approval push is inherently stateful.
-This section defines the two interaction models by which a conforming
-implementation may bridge that gap, and what each must guarantee on the
-wire. Applies to **Class A** implementations that defer submissions;
-conformance keywords per BCP 14 (`00-overview.md`).
-
----
+Git-over-HTTP is stateless, and a held-for-approval push is stateful. This
+section defines two models for bridging that gap and what each guarantees
+on the wire (`01` §5.6). Applies to **Class A** implementations that defer
+submissions. Conformance keywords per BCP 14 (`00-overview.md`).
 
 ## 1. Terminology
 
@@ -61,9 +56,10 @@ reviewed.
 outcome is one of `approved` (then `forwarded`/`error`), `rejected`, or
 `canceled`, with the evidence those transitions require.
 
-**DF-5** — Both models MUST behave equivalently, from the reviewer's and
-auditor's perspective, for the same submission: the model is an interaction
-choice, not a policy difference.
+**DF-5** — For the same submission, both models MUST produce equivalent
+outcomes as seen by the reviewer and the auditor. The model governs the
+client interaction only; the policy result and the audit trail are
+identical either way.
 
 ## 4. Model H requirements
 
@@ -90,10 +86,9 @@ connected.
 
 **DF-10** — An approval MUST be consumable only by a retry targeting the
 same repository, ref, and commit range for which it was granted. A retry
-to any other repository or ref MUST NOT consume the approval.
-*(Grounded in an observed vulnerability class: without repository scoping,
-an approval for one repository can be replayed against another whose
-branch tip matches.)*
+to any other repository or ref MUST NOT consume the approval. Without
+repository scoping, an approval for one repository can be replayed against
+another whose branch tip matches.
 
 **DF-11** — The implementation MUST define and document its retry
 re-identification method. Matching on the exact commit range is the

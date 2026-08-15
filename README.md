@@ -12,9 +12,7 @@ specifies the behaviour that exists only because an intermediary is present.
 
 ## Status
 
-**Working draft. Nothing is frozen.** Requirement IDs are intended to stay
-stable once assigned so that conformance tests and review comments can cite
-them, but wording, structure, and open questions are all still in motion.
+Draft. Wording, structure, and open questions are all in motion.
 
 ## How to read it
 

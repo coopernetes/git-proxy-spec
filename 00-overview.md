@@ -1,14 +1,10 @@
 # Policy-Enforcing Git Proxy — Draft Specification
 
-**Status:** Working draft. Nothing here is frozen; requirement IDs (`LC-n`,
-`DF-n`, `PR-n`, `AU-n`, `FR-n`, `CP-n`, `HK-n`, `ID-n`) are intended to
-remain stable once assigned so conformance tests and review comments can
-cite them.
+**Status:** Draft.
 
-**Working title.** "Policy-Enforcing Git Proxy" describes the subject, not a
-product: a reverse proxy that sits between a Git client and an upstream Git
-server and can refuse, defer, or permit operations according to policy. The
-specification is intended to admit multiple independent implementations,
+A policy-enforcing Git proxy is a reverse proxy between a Git client and an
+upstream Git server that can refuse, defer, or permit operations according
+to policy. This specification admits multiple independent implementations,
 including minimal ones that implement only the protocol-conformance class.
 
 ## Goals
@@ -49,15 +45,15 @@ against one product's feature names.
 
 ## Document set
 
-| Document | Contents | Nature |
-| --- | --- | --- |
-| `01-scope-and-method.md` | Scope, conformance classes, protocol baseline (normative reference + proxy delta), derivation method | Mixed — §§4–5 seed normative text; the rest is editorial method |
-| `02-push-approval-state-machine.md` | Push lifecycle: canonical states, legal transitions, evidence requirements (`LC-n`) | Normative draft |
-| `03-deferral-interaction-models.md` | The pending window on the wire: held-connection and reject-and-retry models (`DF-n`) | Normative draft |
-| `04-record-field-sets.md` | Push record, audit view, and fetch record minimum field sets (`PR-n`, `AU-n`, `FR-n`) | Normative draft |
-| `05-capability-positions.md` | Per-capability mediation positions: support/relay/strip/refuse, fail-closed default (`CP-n`) | Normative draft |
-| `06-policy-hook-contract.md` | Policy decision contract: decision-point semantics and the optional external decision protocol (`HK-n`) | Normative draft |
-| `07-identity-resolution.md` | Pusher vs. commit-metadata identity; never-trust-presented-name, capability-conditional resolution (`ID-n`) | Normative draft |
+| Document | Contents |
+| --- | --- |
+| `01-scope-and-method.md` | Scope, conformance classes, protocol baseline, derivation method |
+| `02-push-approval-state-machine.md` | Push lifecycle: canonical states, transitions, evidence (`LC-n`) |
+| `03-deferral-interaction-models.md` | The pending window on the wire: held-connection and reject-and-retry models (`DF-n`) |
+| `04-record-field-sets.md` | Push record, audit view, and fetch record field sets (`PR-n`, `AU-n`, `FR-n`) |
+| `05-capability-positions.md` | Per-capability mediation positions (`CP-n`) |
+| `06-policy-hook-contract.md` | Policy decision contract and the optional external decision protocol (`HK-n`) |
+| `07-identity-resolution.md` | Pusher and commit-metadata identity; resolution requirements (`ID-n`) |
 
 ## Conformance language
 
@@ -72,11 +68,9 @@ MUST.**
 
 ## Provenance
 
-Derived from the observed behaviour of a working reference implementation,
-with the Git project's own protocol documentation as the normative
-baseline for everything Git already specifies. Requirements with no
-current implementation are confined to security-critical proxy-delta items
-derived from Git's documented protocol surface (`01`, §9).
+Requirements are derived from the observed behaviour of working
+implementations, with the Git project's protocol documentation as the
+baseline for everything Git already specifies (`01`, §9).
 
 ## Editing conventions
 

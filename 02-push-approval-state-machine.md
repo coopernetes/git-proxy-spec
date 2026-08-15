@@ -1,11 +1,7 @@
 # Push Lifecycle and Approval State Machine
 
-Part of the Policy-Enforcing Git Proxy specification (working draft).
-Applies to implementations claiming **Class A** (policy and audit); a
-Class-P-only implementation does not implement a lifecycle and is exempt
-from this section. Conformance keywords per BCP 14 (`00-overview.md`).
-
----
+Applies to implementations claiming **Class A**. Conformance keywords per
+BCP 14 (`00-overview.md`).
 
 ## 1. Terminology
 
@@ -88,8 +84,8 @@ and a human-readable reason. This includes system-generated cancellations
 (disconnect, expiry), whose reason MUST state the mechanism.
 
 **LC-6** — Every transition into `approved` MUST record a structured
-attestation — not a bare flag. An approval produced by policy rather than
-a person MUST carry the `automated` actor type.
+attestation carrying the deciding actor, actor type, and timestamp. An
+approval produced by policy carries the `automated` actor type.
 
 **LC-7** — A submission MUST NOT remain `pending` indefinitely. An
 implementation MUST enforce a bounded review window; on expiry the
@@ -144,9 +140,8 @@ only if the derivation to a canonical state is total and unambiguous —
 including `pending`, which in such representations is typically the
 *absence* of every terminal flag plus a waiting marker. The derivation
 function is part of the implementation's conformance claim and must be
-documented. Note that a single flag covering both "denied by a check" and
-"awaiting review" cannot satisfy LC-4, since the two are not derivable
-from it.
+documented. A single flag covering both "denied by a check" and "awaiting
+review" cannot satisfy LC-4, since the two are not derivable from it.
 
 ## Appendix B (non-normative) — proposed extension: structured findings and per-finding exemptions
 

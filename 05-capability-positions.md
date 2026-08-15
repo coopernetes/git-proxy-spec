@@ -1,15 +1,10 @@
-# Capability Mediation — Position Statements
+# Capability Mediation
 
-Part of the Policy-Enforcing Git Proxy specification (working draft).
 Elaborates `01` §5.1 into per-capability positions. Conformance keywords
-per BCP 14 (`00-overview.md`). Requirement IDs: `CP-n`.
-
-Source documents: `gitprotocol-capabilities(5)` (v0/v1),
-`gitprotocol-v2(5)`. Positions marked **TODO** are deliberately
-unresolved pending protocol research or a design decision — they are not
-implicit permissions.
-
----
+per BCP 14 (`00-overview.md`). Requirement IDs: `CP-n`. Source documents:
+`gitprotocol-capabilities(5)` (v0/v1), `gitprotocol-v2(5)`. Positions
+marked **TODO** are deliberately unresolved pending protocol research or a
+design decision.
 
 ## 1. Position vocabulary
 
@@ -64,9 +59,9 @@ divide into two kinds:
   unless it can honour it against the configured upstream — for these,
   the subset rule of CP-5 applies in every mode.
 
-Note that a store-and-forward advertisement is an allowlist by
-construction — the intermediary offers what its own server
-implementation supports — so no fail-closed rule is needed there.
+A store-and-forward advertisement is an allowlist by construction — the
+intermediary offers what its own server implementation supports — so no
+fail-closed rule is needed there.
 
 **CP-7** — **Unknown capabilities.** In a transparent relay, a
 capability the implementation does not recognize is relayed by default:

@@ -1,12 +1,4 @@
-# Scope, Conformance, and Method — Rev 3
-
-Working notes plus seed normative text for the Policy-Enforcing Git Proxy
-specification. **Rev 3** — scope rings recast as conformance classes;
-derivation method condensed (§1, §9); carve-out added for
-security-critical proxy-delta items (§9); upstream environment section
-added (§6); protocol surface restricted to the smart protocol.
-
----
+# Scope, Conformance, and Method
 
 ## 1. Purpose and framing
 
@@ -35,32 +27,21 @@ prior art and evaluated for inclusion by the same criterion (§9).
 
 ## 2. The core discipline
 
-> Specify **what capability must exist and how it is observed from
-> outside**. Never specify **which library, architecture, or internal
-> structure provides it**.
+Specify the capability that must exist and how it is observed from outside;
+leave the mechanism to the implementation. A requirement qualifies as a
+MUST only when a conformance test can observe it from outside — through a
+Git client or through the audit trail.
 
-**Litmus test:** if you cannot write a conformance test that observes a
-behaviour from *outside* the black box, it is not a MUST.
-
-Worked example, using OIDC authentication:
-
-- ❌ "Implementations MUST use library X for OIDC" — implementation detail.
-- ✅ "A conforming implementation MUST support OIDC-discovery-based
-  authentication against a compliant IdP" — observable capability.
-
-Which library provides the capability — or whether it is hand-rolled — is
-an implementation trade-off outside the spec's concern. Note that
-"compliant IdP" is doing real work in that sentence: production IdPs
-deviate from the OIDC specifications in known ways (issuer values,
-discovery metadata), so a conformance test for this capability must target
-a reference IdP, not any particular product.
+Policy rejection is an example. A push that violates a rule is refused, and
+the Git client receives a readable reason for the refusal. One
+implementation produces this by terminating the protocol in a local
+receive-pack; another relays it through a git subprocess. The
+specification constrains only the observable result: the client learns
+that the push was refused, and why.
 
 ---
 
 ## 3. Conformance classes
-
-Formerly "three concentric rings." Recast as classes so an implementation
-can state precisely what it claims.
 
 ### Class P — Protocol conformance (mandatory for every implementation)
 
@@ -111,8 +92,8 @@ over HTTPS and SSH, as defined by:
 | `gitprotocol-pack(5)` | pkt-line framing, v0/v1 exchange |
 | `gitprotocol-capabilities(5)` | v0/v1 capability semantics |
 
-**And then stop.** Every sentence beyond a reference is a worse copy of a
-document we do not own and cannot keep in sync.
+These documents are referenced, not restated; a copy here would only drift
+from the originals.
 
 The specification's protocol surface is the **smart protocol only**; the
 dumb protocol is out of scope entirely (§5.7). More generally, mechanisms
@@ -122,14 +103,14 @@ The boundary of that pruning: protocol v2 covers fetch only, and push
 remains a v0/v1 `receive-pack` exchange, so v0/v1 stays in scope for as
 long as push itself depends on it.
 
-### Confirmed by upstream: URL paths are out of scope
+### URL paths
 
-`$GIT_URL` is explicitly opaque. Upstream states servers SHOULD handle all
-requests matching `$GIT_URL`, because both protocols work by appending path
+`$GIT_URL` is opaque. Git states servers SHOULD handle all requests
+matching `$GIT_URL`, because both protocols work by appending path
 components; documented examples include catch-all CGI gateways with query
-strings and nested submodule paths. **Git does not care about route shape.**
-A spec mandating a route layout would be *narrower than Git itself*. The
-only defensible normative statement is prefix-completeness:
+strings and nested submodule paths. Git does not constrain route shape, and
+a specification mandating a route layout would be narrower than Git itself.
+The only defensible requirement is prefix-completeness:
 
 > An implementation MUST, for whatever prefix it serves as `$GIT_URL`,
 > handle all protocol sub-paths appended to that prefix.

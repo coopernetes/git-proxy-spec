@@ -1,18 +1,14 @@
 # Policy Decision Contract
 
-Part of the Policy-Enforcing Git Proxy specification (working draft).
 Applies to implementations claiming **Class A**. Conformance keywords per
 BCP 14 (`00-overview.md`). Requirement IDs: `HK-n`.
 
 Defines how a policy decision is reached and expressed, in two layers:
 
 - **§3 — the decision-point contract**: the semantics every policy check
-  observes and returns, whatever mechanism runs it. Specified as
-  behaviour, not as a programming interface.
+  observes and returns, independent of the mechanism that runs it.
 - **§4 — the external decision protocol**: an optional wire protocol for
   delegating a decision to a process outside the intermediary.
-
----
 
 ## 1. Terminology
 
@@ -64,10 +60,9 @@ whole of its required environment. A contract that can only be satisfied
 by presenting transport machinery forces every transport and mode to
 reconstruct that machinery, and is non-conforming.
 
-*(HK-2 is what lets one decision point serve every transport and mode —
-in the reference designs, the same check runs unchanged under both a
-store-and-forward pre-receive chain and a transparent-proxy filter
-chain.)*
+HK-2 is what lets one decision point serve every transport and mode: the
+same check runs unchanged under a store-and-forward pre-receive chain and
+a transparent-proxy filter chain.
 
 ### 3.2 Verdict vocabulary
 
@@ -149,8 +144,7 @@ implementations.
 ### 4.1 Binding
 
 **HK-9** — The external decision protocol is HTTP with a JSON request and
-response body. (A single binding is defined so delegates are portable; no
-second binding is specified.)
+response body.
 
 ### 4.2 Request
 
