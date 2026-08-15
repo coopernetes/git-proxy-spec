@@ -34,7 +34,7 @@ Drafted:
 - Capability mediation positions (`05`)
 - Policy decision contract (`06`)
 - Identity resolution (`07`)
-- Upstream capability matrix (`08`, informative)
+- SCM platform capability matrix (`08`, informative)
 
 Open:
 

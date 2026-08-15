@@ -1,7 +1,11 @@
-# Upstream Capability Designations (informative)
+# SCM Platform Capabilities (informative)
 
-This document maps upstream SCM platforms to the capability-conditional
-features of `01` §6.1. It is **informative** reference material: the
+The "capabilities" here are the integration surfaces an SCM platform
+exposes — identity APIs, OAuth, namespace structure — not the git protocol
+capabilities negotiated on the wire (`05`); the two are unrelated.
+
+This document maps SCM platforms to the capability-conditional features of
+`01` §6.1. It is **informative** reference material: the
 normative requirement is that an implementation documents, per feature,
 the upstream capabilities that feature depends on (`01` §6.1), and degrades
 observably where a configured upstream lacks them. The matrix here records

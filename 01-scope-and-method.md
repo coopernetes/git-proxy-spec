@@ -419,7 +419,7 @@ capability-conditional feature; its requirements are in
 
 Conformance tests for capability-conditional features run only against an
 upstream that provides the capability; a test suite MUST distinguish "not
-applicable in this environment" from "failed". `08-upstream-capabilities.md`
+applicable in this environment" from "failed". `08-scm-capabilities.md`
 maps these capabilities onto widely-deployed platforms (informative).
 
 ### 6.2 Repository identity and namespace derivation
