@@ -168,12 +168,12 @@ objects". In v1 the equivalent is gated behind `allow-tip-sha1-in-want` /
 
 v2 is negotiated via the `Git-Protocol` HTTP header, and over SSH via the
 `GIT_PROTOCOL` environment variable — which upstream notes the server may
-need explicit configuration to permit.
+need explicit configuration to permit. Handling of these headers is a
+common and easily overlooked source of proxy bugs, and is verifiable from
+outside on each transport by a conformance test.
 
 > An implementation MUST propagate protocol version negotiation on both
 > transports. Silent downgrade to v0 is a conformance failure.
-
-Testable from outside per transport. A classic and invisible proxy bug.
 
 ### 5.4 Denial semantics
 
