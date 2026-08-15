@@ -34,14 +34,13 @@ Drafted:
 - Capability mediation positions (`05`)
 - Policy decision contract (`06`)
 - Identity resolution (`07`)
+- Upstream capability matrix (`08`, informative)
 
 Open:
 
 - Conformance test outline — one test per MUST, observed externally
 - Class P normative-reference table — needs a citation check against the
   current `gitprotocol-*` man pages
-- Upstream capability designations — enumerate the capability set that
-  capability-conditional features depend on (`01` §6.1)
 - Upstream patch candidates — ambiguities found in the Git documentation
   during derivation, to be filed with the Git project rather than
   specified around

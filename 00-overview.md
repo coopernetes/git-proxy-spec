@@ -54,6 +54,7 @@ against one product's feature names.
 | `05-capability-positions.md` | Per-capability mediation positions (`CP-n`) |
 | `06-policy-hook-contract.md` | Policy decision contract and the optional external decision protocol (`HK-n`) |
 | `07-identity-resolution.md` | Pusher and commit-metadata identity; resolution requirements (`ID-n`) |
+| `08-upstream-capabilities.md` | Informative: what upstream SCM platforms offer, mapped to the capability-conditional features |
 
 ## Conformance language
 
