@@ -20,16 +20,24 @@ git server offers none of the API-backed capabilities.
   presented credential (a PAT or bearer token) to the account it belongs
   to. This is what lets the intermediary resolve the pusher from the
   credential rather than the presented username (`07` ID-2, ID-3).
-- **Key identity resolution** — an endpoint listing an account's
-  registered SSH public keys, letting the intermediary resolve the pusher
-  of an SSH push by matching the connecting key's fingerprint. The SSH
-  analogue of token identity resolution.
+- **Key identity resolution** — an endpoint listing a *named* account's
+  registered SSH public keys (`.../users/{login}/keys`). Because the login
+  is an input, this endpoint **confirms rather than discovers**: the
+  intermediary must already hold candidate logins for the pusher, fetch
+  each login's keys, and match the connecting key's fingerprint. It
+  therefore presupposes an established pusher-to-account link — a key
+  alone cannot be reversed to its owner. This is the asymmetry with token
+  resolution, where the credential is self-identifying: a token push can
+  bootstrap identity, an SSH-key push can only verify an identity already
+  linked. A first-time SSH pusher with no prior link is unresolvable even
+  where the platform offers a key-listing API.
 - **OAuth identity linking** — an OAuth2 authorization-code flow through
-  which a user proves ownership of their upstream account. Token and key
-  resolution both presuppose a link between the pusher and their upstream
-  account(s); OAuth establishes that link directly and verifiably, with no
-  manual administrator mapping, and — with appropriate scopes — yields a
-  token the intermediary can forward on the user's behalf (`01` §5.10).
+  which a user proves ownership of their upstream account. It establishes
+  the pusher-to-account link directly and verifiably, with no manual
+  administrator mapping — the link key resolution requires, and the
+  bootstrap an SSH-first pusher cannot get from a key alone. With
+  appropriate scopes it also yields a token the intermediary can forward on
+  the user's behalf (`01` §5.10).
 - **Verified email** — whether the identity response carries a usable
   account email, which a commit author/committer verification policy can
   match against (`07` ID-6).
