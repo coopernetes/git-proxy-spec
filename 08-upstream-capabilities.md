@@ -31,13 +31,15 @@ git server offers none of the API-backed capabilities.
   bootstrap identity, an SSH-key push can only verify an identity already
   linked. A first-time SSH pusher with no prior link is unresolvable even
   where the platform offers a key-listing API.
-- **OAuth identity linking** — an OAuth2 authorization-code flow through
-  which a user proves ownership of their upstream account. It establishes
-  the pusher-to-account link directly and verifiably, with no manual
-  administrator mapping — the link key resolution requires, and the
-  bootstrap an SSH-first pusher cannot get from a key alone. With
-  appropriate scopes it also yields a token the intermediary can forward on
-  the user's behalf (`01` §5.10).
+- **OAuth identity linking** — a browser-based OAuth2 authorization-code
+  flow, out of band from any git push, in which a user proves ownership of
+  their upstream account. It establishes the pusher-to-account link
+  verifiably and with no manual administrator mapping. The SSH key is never
+  part of this exchange; what OAuth supplies is the link itself, so that
+  once an account is linked, key resolution has a candidate login to match
+  the connecting key against — the missing piece for an SSH-first pusher.
+  Separately, with appropriate scopes, the same flow can yield a token the
+  intermediary forwards on the user's behalf (`01` §5.10).
 - **Verified email** — whether the identity response carries a usable
   account email, which a commit author/committer verification policy can
   match against (`07` ID-6).
