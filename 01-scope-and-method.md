@@ -96,7 +96,7 @@ These documents are referenced, not restated; a copy here would only drift
 from the originals.
 
 The specification's protocol surface is the **smart protocol only**; the
-dumb protocol is out of scope entirely (§5.7). More generally, mechanisms
+dumb protocol is out of scope entirely (§5.8). More generally, mechanisms
 production upstreams have retired are out of scope rather than specified
 defensively — the surface tracks what upstreams actually serve (§5.1).
 The boundary of that pruning: protocol v2 covers fetch only, and push
@@ -164,7 +164,33 @@ objects". In v1 the equivalent is gated behind `allow-tip-sha1-in-want` /
 > Authorization decisions MUST be made on object reachability, not on
 > refname alone. A refname-only policy is walkable via raw OID requests.
 
-### 5.3 Protocol version passthrough
+### 5.3 Inspection completeness
+
+Content inspection is sound only if the intermediary can see the complete
+set of objects a push introduces. A push that defeats that visibility MUST
+be rejected.
+
+- **Reachability.** Every object in the pushed pack MUST be reachable from
+  the ref update being performed. An implementation MUST reject a push
+  whose pack contains a commit not reachable from the claimed old→new range
+  — a hidden or unreferenced commit — because such an object would enter
+  the repository without passing reachability-based inspection. Where the
+  reachable set cannot be determined, the push MUST be rejected.
+- **Object coverage.** Inspection MUST cover every kind of object the push
+  introduces, including annotated tag objects — their tagger identity,
+  message, and signature. Dereferencing a tag to its target commit and
+  inspecting only the commit leaves the tag a bypass channel.
+
+A conforming implementation MUST reject a push that updates more than one
+ref. A single-ref push has one old→new range whose reachable set bounds
+what inspection must cover; multiple ref updates in one push multiply that
+surface and its object-smuggling exposure without a corresponding need.
+
+The capability positions of §5.1 (`packfile-uris`, `filter`) and the
+dumb-protocol refusal of §5.8 enforce this same completeness principle at
+the transport level.
+
+### 5.4 Protocol version passthrough
 
 v2 is negotiated via the `Git-Protocol` HTTP header, and over SSH via the
 `GIT_PROTOCOL` environment variable — which upstream notes the server may
@@ -175,49 +201,91 @@ outside on each transport by a conformance test.
 > An implementation MUST propagate protocol version negotiation on both
 > transports. Silent downgrade to v0 is a conformance failure.
 
-### 5.4 Denial semantics
+### 5.5 Denial semantics
 
-Already normative upstream and easy to get wrong:
+Denials reach the client from two sources, and the intermediary treats
+them differently.
 
-- Repo exists, access not permitted → **MUST** be `403 Forbidden`
-- Repo/resource does not exist → **MUST NOT** be `200`; SHOULD be
-  `404`/`410`
-- Unrecognized or administratively disabled service name → **MUST** be `403`
+**Intermediary-originated denials** — its own policy rejection (§5.6), its
+own authorization decision, an unrecognized or administratively disabled
+service, or an unparseable path. The intermediary is the authority for
+these and MUST signal them clearly:
 
-**Information-disclosure tension to resolve explicitly:** strict
-conformance distinguishes "exists but forbidden" from "does not exist",
-which leaks repository existence. The spec must state a position rather
-than let implementations silently diverge. **Open issue.**
+- refusal by the intermediary's own authorization → `403 Forbidden` on HTTP
+- unrecognized or administratively disabled service name → `403 Forbidden`
+- a policy denial after pack transfer has begun → the readable mid-stream
+  error of §5.6
 
-**Cross-transport consistency:** SSH has no `403`. Equivalent denial
-semantics across HTTPS and SSH is a proxy-delta requirement with no
-upstream answer.
+**Upstream-originated denials** — whether a repository exists, and whether
+the client may access it, are determinations only the upstream can make.
+The intermediary MUST relay the upstream's response faithfully and MUST NOT
+resolve it into a finer distinction than the upstream provides. An upstream
+commonly returns "not found" for a private repository the client cannot
+access, concealing whether the repository exists; the intermediary MUST
+relay that response unchanged, MUST NOT convert it into a "forbidden" that
+would disclose the repository's existence, and MUST NOT present an upstream
+denial as success (`200`).
 
-### 5.5 Mid-stream rejection signalling
+The intermediary cannot itself tell whether an upstream "not found" means
+the repository is absent or the client lacks access. It MAY attach a
+descriptive message directing the client to verify their credentials and
+access with the upstream, but MUST NOT assert a cause the upstream did not
+state.
 
-Upstream defines the channel: sideband stream 3 is the fatal error message
-sent immediately before the stream aborts, and `no-progress` suppresses
-stream 2 while explicitly leaving 3 available for errors.
+**Cross-transport consistency.** SSH carries no HTTP status codes. For
+intermediary-originated denials, an implementation MUST present an
+equivalent readable refusal on each transport it serves; for
+upstream-originated denials, it relays what the upstream returns on that
+transport. Where the SSH legs use agent forwarding (§5.10), the upstream
+authenticates the client's own key and evaluates existence and access
+against the client's identity; its denial is authoritative for that
+client, and the intermediary MUST relay it unmodified.
 
-> A policy denial occurring after pack transfer has begun MUST be surfaced
-> to the Git client as a readable error — sideband 3 on fetch;
-> `report-status` with per-ref `ng <ref> <reason>` on push — never as a
-> transport hang or broken pipe.
+### 5.6 Mid-stream rejection signalling
 
-Also specify: whether the proxy drains or resets the inbound stream, and
-any size/time bound at which it aborts.
+Once a smart-HTTP request has been dispatched to a git service the HTTP
+status is `200`, and the outcome is carried in the pkt-line body. A denial
+reached at this point MUST be delivered in that body; closing the
+connection instead produces "the remote end hung up unexpectedly" on the
+client and loses the reason.
 
-### 5.6 Statelessness vs. the approval workflow
+Git provides three in-body mechanisms, and the one to use depends on the
+phase and the operation:
 
-Upstream is emphatic: Git-over-HTTP is stateless from the server's
-perspective; all state is retained by the client; this is what permits
-round-robin load balancing. A held-for-approval push is inherently
-stateful. This does **not** violate the protocol — the push is deferred or
-rejected in protocol terms — but the interaction model is the single most
-implementation-divergent behaviour between any two policy proxies, and has
-no upstream answer. Now drafted as `03-deferral-interaction-models.md`.
+- **Ref advertisement and negotiation** (`info/refs`, `ls-refs`,
+  `upload-pack` want/have): a pkt-line `ERR <message>` packet. Sideband is
+  not available in this phase.
+- **Push (`receive-pack`)**: a report-status — `unpack ok` followed by
+  per-ref `ng <ref> <reason>` — carried on sideband band 1, with
+  human-readable detail on band 2. The client renders each `ng` as
+  `! [remote rejected] <ref> (<reason>)`, which reads as a policy decision
+  rather than a failure. It requires the client to have advertised
+  `report-status` (or `report-status-v2`) and `side-band-64k`.
+- **Fetch (`upload-pack`) after packfile transfer has begun**: a sideband
+  band-3 fatal error, which aborts the stream and surfaces as
+  `fatal: <message>`.
 
-### 5.7 Dumb protocol — out of scope, refused
+> A denial reached after the git service has been dispatched MUST be
+> delivered to the client in the pkt-line body, never as a transport hang
+> or reset. On push, where `report-status` and `side-band-64k` were
+> negotiated, the denial MUST be a per-ref `ng <ref> <reason>`
+> report-status; a band-3 fatal error is used only where those
+> capabilities were not negotiated. The reason carried to the client MUST
+> match the reason recorded in the audit trail.
+
+An implementation MUST define how it treats the inbound request body on
+denial — whether it drains or resets it — and any size or time bound at
+which it aborts reception.
+
+### 5.7 Deferral and statelessness
+
+Holding a push for review introduces server-side state that Git-over-HTTP
+does not assume. Reconciling that with the protocol's stateless model is a
+proxy-delta concern; the interaction models for it — what the client sees,
+whether the pack is retained, how a retry is correlated — are specified in
+`03-deferral-interaction-models.md`.
+
+### 5.8 Dumb protocol — out of scope, refused
 
 The dumb protocol serves loose objects and packfiles over plain `GET` with
 no Git-aware server process — bypassing `upload-pack` and therefore **all**
@@ -226,19 +294,12 @@ only.
 
 > A conforming implementation MUST NOT serve or relay dumb-protocol
 > object paths. Requests for them are refused per the denial semantics of
-> §5.4.
+> §5.5.
 
-### 5.8 Smaller normative items
+### 5.9 Smaller normative items
 
 - **`object-format`** — SHA-256 repositories exist; both hash algorithms
   MUST be handled.
-- **`session-id`** — server-advertised identifier for correlating a
-  process across requests. Natural **audit record field**; feeds Class A.
-- **v2 command allowlisting** — `ls-refs` / `fetch` / `object-info` give a
-  clean policy point. `object-info` leaks object sizes without
-  transferring content.
-- **Caching** — upstream requires Cache-Control headers preventing caching
-  of upload-pack results; state what MAY and MUST NOT be cached.
 - **HTTP 1.0/1.1 and chunked encoding** — both SHOULD be supported on
   request and response bodies; interacts with streaming vs. buffering
   inspection.
@@ -254,7 +315,7 @@ only.
   that dereferences tags to their target commit and inspects only the
   commit leaves the tag object itself a bypass channel.
 
-### 5.9 Credential custody and authorization layering
+### 5.10 Credential custody and authorization layering
 
 The intermediary sits between two authorization contexts: its own policy
 decisions and the upstream's. The guarantees:
@@ -447,41 +508,4 @@ draft):
 | Present only in another implementation | Candidate SHOULD; evaluate for inclusion |
 | Present in no implementation, security-critical proxy-delta | MUST (the §9 carve-out) |
 | Present in no implementation, product feature | Non-normative proposed extension |
-
----
-
-## 10. Failure modes to watch for
-
-1. **Creeping inward** toward architecture — mandating internals.
-2. **Creeping outward** — normative requirements for optional features.
-3. **Restating Git** — the failure mode §4 exists to prevent.
-
----
-
-## 11. Deliverables checklist
-
-- [x] Approval state machine — states + legal transitions (`02`)
-- [x] Deferral interaction model (`03`) — first draft; open issues listed
-- [ ] Ring/class P normative-reference table — drafted above, needs citation check
-- [x] Push record — minimum field set (`04`)
-- [x] Audit record — minimum field set, incl. `session-id` correlation
-      (`04` — specified as the audit *view* over the push record)
-- [x] Policy hook interface contract (`06` — decision-point semantics
-      `HK-1..HK-8`, external decision protocol `HK-9..HK-13`)
-- [x] Identity-resolution requirements (`07` — pusher MUST resolved
-      `ID-1..ID-4`, commit metadata soft `ID-5..ID-6`)
-- [~] Minimal policy-enforcement feature set — resolved as "already
-      covered, do not restate": commit-data capture is `04` PR-1/§2.2
-      (MUST), content availability is `06` HK-1 + `01` §5.1/§5.7/§5.8,
-      mechanism-freedom is `06` §2/HK-2; specific content scanners stay
-      out of scope (Ring 3)
-- [ ] Conformance test outline — one test per MUST, observed externally
-- [x] Capability-mediation position statements (`05` — TODOs remain on
-      `push-cert`, `push-options`, `report-status-v2`, `sideband-all`)
-- [ ] Denial-semantics position on existence disclosure (§5.4 open issue)
-- [ ] Upstream capability designations — enumerate the capability set
-      features may depend on (§6.1: identity endpoint, key listing,
-      namespace-bearing URLs)
-- [ ] Upstream patch candidates — ambiguities found in git-scm docs during
-      derivation, filed to the Git project rather than specified around
 

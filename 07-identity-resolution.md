@@ -110,7 +110,7 @@ of the deployment. The intermediary's audit trail becomes the sole
 authority for per-pusher attribution; an implementation MUST NOT represent
 the upstream's records as carrying attribution they do not hold.
 
-In this mode the attribution requirement of `01` §5.9 is satisfied by the
+In this mode the attribution requirement of `01` §5.10 is satisfied by the
 intermediary's audit trail (ID-9); independent upstream-side attribution is
 forgone by design, and ID-10 requires that trade to be visible.
 

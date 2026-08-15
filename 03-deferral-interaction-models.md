@@ -2,7 +2,7 @@
 
 Git-over-HTTP is stateless, and a held-for-approval push is stateful. This
 section defines two models for bridging that gap and what each guarantees
-on the wire (`01` §5.6). Applies to **Class A** implementations that defer
+on the wire (`01` §5.7). Applies to **Class A** implementations that defer
 submissions. Conformance keywords per BCP 14 (`00-overview.md`).
 
 ## 1. Terminology
@@ -46,7 +46,7 @@ or mode it serves.
 
 **DF-2** — Deferral MUST be signalled to the Git client as well-formed
 protocol output — sideband progress and/or `report-status` — never as a
-transport hang, silent timeout, or connection reset (`01` §5.5).
+transport hang, silent timeout, or connection reset (`01` §5.6).
 
 **DF-3** — The client-visible deferral notice MUST include the correlation
 identifier, and SHOULD include a URL at which the submission can be
@@ -176,6 +176,6 @@ sequenceDiagram
   instance-affinity consequence deserves a non-normative note.
 - **SSH parity.** Model H maps naturally onto SSH (the channel stays open;
   sideband works identically). Model R's `report-status` behaviour is
-  transport-neutral, but denial semantics differ on SSH (`01` §5.4).
+  transport-neutral, but denial semantics differ on SSH (`01` §5.5).
   Confirm both models specify cleanly for both transports before freezing.
 

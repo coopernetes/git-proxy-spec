@@ -87,8 +87,8 @@ is immutable or versioned.
 non-normative. Each configured question and the reviewer's response to it
 MUST be individually recoverable.
 
-**PR-3** — Current implementations record one (ref, old, new) triple per
-submission. Multi-ref pushes are an open issue (§5).
+**PR-3** — A push carries exactly one (ref, old, new) triple; multi-ref
+pushes are rejected (`01` §5.3).
 
 ## 3. Audit view — minimum field set
 
@@ -102,11 +102,6 @@ transition was rule-driven, the matched rule MUST be identifiable
 **AU-2** — Storage form is non-normative (explicit event log or
 derivation from the push record), provided AU-1 is satisfiable for every
 submission, including those that ended in `error`.
-
-**AU-3** — Where the upstream advertises a `session-id` capability
-(`01` §5.8), the intermediary SHOULD record the upstream session
-identifier on the record, enabling correlation between the intermediary's
-audit trail and the upstream's own logs.
 
 ## 4. Fetch operation record
 
@@ -123,9 +118,6 @@ disposition (allowed / denied), and the matched rule for denials.
   Interacts directly with `03` DF-10 scoping and `01` §6.2 binding. The
   draft's `id` is "opaque, unique per submission"; whether content-derived
   identifiers can conform needs an explicit position.
-- **Multi-ref pushes.** `git push` can update several refs atomically;
-  the record shape for more than one (ref, old, new) triple per
-  submission is undefined (PR-3).
 - **Redaction vs. completeness.** Evidence content can itself contain
   secret material. Post-terminal redaction of stored evidence conflicts
   with audit-trail immutability expectations; the spec needs a stated

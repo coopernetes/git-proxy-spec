@@ -51,7 +51,7 @@ available a read-only view of the submission comprising at least: the
 submission `id`, the canonical repository identity (`01` §6.2), the
 target ref and the old/new object ids, the submitter's presented and
 (where resolved) upstream identity, and the commit content the push
-introduces (`04` §2.2), including annotated tag objects (`01` §5.8).
+introduces (`04` §2.2), including annotated tag objects (`01` §5.9).
 
 **HK-2** — A decision point MUST NOT require, as a condition of running,
 any transport-specific artifact (an HTTP request object, a servlet
@@ -121,7 +121,7 @@ submission can influence.
 **HK-7** — A decision point MUST be free of side effects that alter the
 submission or the evaluation of other decision points. Its only output is
 its verdict and findings. (Redaction of stored evidence is a host
-responsibility, not a decision-point side effect — `01` §5.9 retention,
+responsibility, not a decision-point side effect — `01` §5.10 retention,
 `04` §5.)
 
 ### 3.5 Ordering guarantees
@@ -152,7 +152,7 @@ response body.
 object carrying the HK-1 guaranteed inputs plus the protocol version. The
 field set is the push record projection of `04` restricted to the HK-1
 inputs; the intermediary MUST NOT include the client's authorization
-material (`01` §5.9) in the request.
+material (`01` §5.10) in the request.
 
 ### 4.3 Response
 
