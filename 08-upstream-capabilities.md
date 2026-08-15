@@ -39,7 +39,9 @@ git server offers none of the API-backed capabilities.
   once an account is linked, key resolution has a candidate login to match
   the connecting key against — the missing piece for an SSH-first pusher.
   Separately, with appropriate scopes, the same flow can yield a token the
-  intermediary forwards on the user's behalf (`01` §5.10).
+  intermediary forwards on the user's behalf over HTTP (`01` §5.10); this
+  is distinct from SSH on-behalf-of forwarding, which uses agent
+  forwarding, not a token.
 - **Verified email** — whether the identity response carries a usable
   account email, which a commit author/committer verification policy can
   match against (`07` ID-6).

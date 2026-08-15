@@ -349,9 +349,15 @@ cannot resolve per-client credentials.
 > which it substitutes derived, per-client authorization material for the
 > upstream connection — for example an OAuth-based token exchange, or a
 > deferred park-and-forward capability where passthrough is not workable.
-> The attribution requirement holds unchanged in every such mode. Which
-> mode governs a given route MUST be explicit configuration, and the mode
-> in effect for a submission MUST be determinable from its audit record.
+> The attribution requirement holds unchanged in every such mode; a
+> per-client derived credential — such as the user's own OAuth token —
+> remains attributable to the client at the upstream, unlike the shared
+> intermediary-controlled identity of `07` §4. Token-based forwarding is
+> an HTTP mechanism: an OAuth token authenticates HTTP git operations,
+> and the SSH counterpart of on-behalf-of forwarding is agent forwarding
+> (below). Which mode governs a given route MUST be explicit
+> configuration, and the mode in effect for a submission MUST be
+> determinable from its audit record.
 
 > **Authorization layering.** The intermediary's policy authorization
 > supplements upstream authorization and MUST NOT replace it: an upstream
