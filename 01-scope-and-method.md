@@ -90,7 +90,11 @@ scope**. An implementation claiming Class A also claims Class P.
 - Dashboard / UI of any kind
 - Specific content scanners (secret scanning, OCR/PII, DLP integrations)
 - SCM OAuth integrations and API proxying (PR creation, issue management)
-- Caching, rate limiting, quota enforcement
+- Availability and performance functions — caching, rate limiting, quota
+  enforcement — including the recording and audit of the decisions they
+  make. The audit model of this specification (`04`) covers policy
+  decisions; availability decisions and their records are
+  implementation-specific.
 - Any implementation-specific extension
 
 ---
