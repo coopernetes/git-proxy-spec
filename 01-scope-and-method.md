@@ -352,10 +352,14 @@ cannot resolve per-client credentials.
 > The attribution requirement holds unchanged in every such mode; a
 > per-client derived credential — such as the user's own OAuth token —
 > remains attributable to the client at the upstream, unlike the shared
-> intermediary-controlled identity of `07` §4. Token-based forwarding is
-> an HTTP mechanism: an OAuth token authenticates HTTP git operations,
-> and the SSH counterpart of on-behalf-of forwarding is agent forwarding
-> (below). Which mode governs a given route MUST be explicit
+> intermediary-controlled identity of `07` §4. Brokering is largely an
+> HTTP mechanism: an OAuth token authenticates HTTP git operations. SSH
+> has no general per-client brokering equivalent — agent forwarding
+> (below) is passthrough of the client's own key, not a derived
+> credential, and a per-client SSH credential is possible only where the
+> upstream trusts an SSH certificate authority. Absent that, the only SSH
+> substitution is the intermediary's own key, i.e. the shared identity of
+> `07` §4. Which mode governs a given route MUST be explicit
 > configuration, and the mode in effect for a submission MUST be
 > determinable from its audit record.
 
