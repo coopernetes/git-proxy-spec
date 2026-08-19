@@ -29,6 +29,7 @@ conformance-keyword conventions (BCP 14), the goals, and the references.
 | [05-capability-positions.md](05-capability-positions.md) | Per-capability mediation positions (`CP-n`) |
 | [06-policy-hook-contract.md](06-policy-hook-contract.md) | Policy decision contract and external decision protocol (`HK-n`) |
 | [07-identity-resolution.md](07-identity-resolution.md) | Pusher vs. commit-metadata identity; resolution requirements (`ID-n`) |
+| [08-scm-capabilities.md](08-scm-capabilities.md) | Informative: what SCM platforms offer (identity APIs, OAuth, namespaces), mapped to the capability-conditional features |
 
 ## A note on the working notes
 
@@ -37,6 +38,11 @@ Several documents carry collapsed **internal working notes** (fenced
 derivation analysis and are tracked deliberately, not published prose. See
 [PUBLISHING.md](PUBLISHING.md) before making this repository, or any
 document in it, public.
+
+## Contributing
+
+[CONTRIBUTING.md](CONTRIBUTING.md) covers the drafting discipline and
+tracks remaining work.
 
 ## Licence
 
