@@ -7,7 +7,8 @@ proxy that performs policy enforcement, plus the **policy management layer**
 beneath it (approvals, audit records, identity). It is written so that
 multiple independent implementations — including a minimal wireline-only
 proxy with no additional user interface and no approval workflow — can
-conform, each to the conformance class matching its ambitions.
+conform, each to the conformance class matching a specific implementation's
+targe audience, workflow or use case.
 
 **Derivation.** The draft is derived from the observed behaviour of a
 working reference implementations, constrained to what is externally
