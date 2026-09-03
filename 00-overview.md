@@ -5,10 +5,10 @@
 A policy-enforcing Git proxy is a reverse proxy between a Git client and an upstream Git server that can validate a
 `git receive-pack`, reject based on policy, defer forwarding as part of a policy-enforcing workflow (async outside of
 the lifecycle of a single `git push`, or permit operations through according to policy if a push is compliant. This
-specification defines the general behaviour and shared voculabulary to allow for multiple independent implementations.
+specification defines the general behaviour and shared vocabulary to allow for multiple independent implementations.
 
 The target user base for a network-based intermediary to intercept and enforce policy on git data includes regulated
-industries (finance, health care, goverment agencies) with sensitives for intellectual property theft as well as any
+industries (finance, health care, government agencies) with sensitivities to intellectual property theft as well as any
 large organization who relies on Git source code repositories and wishes to enforce policy in a way that is agnostic of
 the underlying git server ("SCM provider").
 
