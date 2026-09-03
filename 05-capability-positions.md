@@ -8,13 +8,13 @@ design decision.
 
 ## 1. Position vocabulary
 
-| Position | Meaning |
-| --- | --- |
+| Position    | Meaning                                                                           |
+| ----------- | --------------------------------------------------------------------------------- |
 | **Support** | The intermediary MUST implement the capability itself; stock clients depend on it |
-| **Relay** | Pass through between client and upstream unmodified; no mediation needed |
-| **Strip** | Remove from the relayed advertisement; the client never sees it offered |
-| **Refuse** | Additionally, reject the request if a client attempts it anyway |
-| **TODO** | Position pending; treated as Strip until resolved |
+| **Relay**   | Pass through between client and upstream unmodified; no mediation needed          |
+| **Strip**   | Remove from the relayed advertisement; the client never sees it offered           |
+| **Refuse**  | Additionally, reject the request if a client attempts it anyway                   |
+| **TODO**    | Position pending; treated as Strip until resolved                                 |
 
 ## 2. Default rules
 
@@ -79,21 +79,21 @@ The baseline tier is what a stock `git push` over HTTPS or SSH exercises
 against any mainstream host: `report-status`, `side-band-64k`,
 `delete-refs`, `ofs-delta`, `quiet`, `agent`, and thin-pack transfer.
 
-| Capability | Typical usage | Position | Notes |
-| --- | --- | --- | --- |
-| `report-status` | Universal; how the client learns per-ref ok/ng | **Support** | Required by `01` §5.6 and `03` DF-9 — this is the denial-signalling channel |
-| `report-status-v2` | Newer clients/hosts | TODO | Extended status with option lines; verify semantics before relaying |
-| `side-band-64k` | Universal; progress and messages during push | **Support** | Required for mid-push messaging (deferral notices, validation output) |
-| `delete-refs` | Branch/tag deletion pushes | **Support** | Deletions are policy-relevant operations: record with zero-id new-value per `04` §2.1. Disallowing deletion is a policy decision and SHOULD be enforced as an auditable per-ref rejection at the policy layer, not by withholding the capability in a transparent relay (CP-1); a store-and-forward advertisement MAY additionally decline to offer it |
-| `ofs-delta` | Universal pack encoding | **Support** | Pack parsing concern; no policy surface |
-| `quiet` | `git push -q` | **Support** | Client preference; suppresses band-2 progress, leaves band-3 errors |
-| `agent` | Universal (client version string) | Relay | MAY be recorded on the push record (client identification aids audit) |
-| `atomic` | `git push --atomic` | Relay | Multi-ref pushes are rejected (`01` §5.3), so this applies only to the trivially-atomic single-ref case |
-| `push-options` | `git push -o <opt>` | TODO | An arbitrary client→server string channel that bypasses nothing but is invisible to policy today; if relayed, the options SHOULD be recorded on the push record |
-| `object-format` | SHA-256 repositories | **Support** | Both algorithms MUST be handled (`01` §5.9); MUST NOT relay a format the inspection pipeline cannot parse |
-| `session-id` | Modern hosts | Relay | Passed through unchanged |
-| `push-cert` | Signed pushes (`git push --signed`) | TODO, Strip until resolved | The certificate signs the server-advertised nonce; a store-and-forward intermediary cannot replay it upstream (the upstream nonce differs). Position needed: terminate-and-record vs. unsupported |
-| thin-pack transfer | Default for stock clients | **Support** | Not an advertised capability on receive-pack — clients send thin packs by default; the intermediary MUST be able to resolve them (base objects available) to inspect content |
+| Capability         | Typical usage                                  | Position                   | Notes                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ---------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `report-status`    | Universal; how the client learns per-ref ok/ng | **Support**                | Required by `01` §5.6 and `03` DF-9 — this is the denial-signalling channel                                                                                                                                                                                                                                                                            |
+| `report-status-v2` | Newer clients/hosts                            | TODO                       | Extended status with option lines; verify semantics before relaying                                                                                                                                                                                                                                                                                    |
+| `side-band-64k`    | Universal; progress and messages during push   | **Support**                | Required for mid-push messaging (deferral notices, validation output)                                                                                                                                                                                                                                                                                  |
+| `delete-refs`      | Branch/tag deletion pushes                     | **Support**                | Deletions are policy-relevant operations: record with zero-id new-value per `04` §2.1. Disallowing deletion is a policy decision and SHOULD be enforced as an auditable per-ref rejection at the policy layer, not by withholding the capability in a transparent relay (CP-1); a store-and-forward advertisement MAY additionally decline to offer it |
+| `ofs-delta`        | Universal pack encoding                        | **Support**                | Pack parsing concern; no policy surface                                                                                                                                                                                                                                                                                                                |
+| `quiet`            | `git push -q`                                  | **Support**                | Client preference; suppresses band-2 progress, leaves band-3 errors                                                                                                                                                                                                                                                                                    |
+| `agent`            | Universal (client version string)              | Relay                      | MAY be recorded on the push record (client identification aids audit)                                                                                                                                                                                                                                                                                  |
+| `atomic`           | `git push --atomic`                            | Relay                      | Multi-ref pushes are rejected (`01` §5.3), so this applies only to the trivially-atomic single-ref case                                                                                                                                                                                                                                                |
+| `push-options`     | `git push -o <opt>`                            | TODO                       | An arbitrary client→server string channel that bypasses nothing but is invisible to policy today; if relayed, the options SHOULD be recorded on the push record                                                                                                                                                                                        |
+| `object-format`    | SHA-256 repositories                           | **Support**                | Both algorithms MUST be handled (`01` §5.9); MUST NOT relay a format the inspection pipeline cannot parse                                                                                                                                                                                                                                              |
+| `session-id`       | Modern hosts                                   | Relay                      | Passed through unchanged                                                                                                                                                                                                                                                                                                                               |
+| `push-cert`        | Signed pushes (`git push --signed`)            | TODO, Strip until resolved | The certificate signs the server-advertised nonce; a store-and-forward intermediary cannot replay it upstream (the upstream nonce differs). Position needed: terminate-and-record vs. unsupported                                                                                                                                                      |
+| thin-pack transfer | Default for stock clients                      | **Support**                | Not an advertised capability on receive-pack — clients send thin packs by default; the intermediary MUST be able to resolve them (base objects available) to inspect content                                                                                                                                                                           |
 
 ## 4. upload-pack (fetch) — v0/v1
 
@@ -101,30 +101,30 @@ Fetch payload flows upstream→client and is deliberately uninspected
 (`01` §5.7 boundary discussion); most fetch capabilities therefore
 Relay. The exceptions are the bypass vectors of `01` §5.1.
 
-| Capability | Typical usage | Position | Notes |
-| --- | --- | --- | --- |
-| `multi_ack`, `multi_ack_detailed`, `no-done` | Universal negotiation | Relay | |
-| `side-band`, `side-band-64k` | Universal | Relay | Band 3 remains available for intermediary error signalling (`01` §5.6) |
-| `thin-pack` | Universal | Relay | Fetch direction; uninspected by design |
-| `shallow`, `deepen-since`, `deepen-not`, `deepen-relative` | CI and shallow clones — very common | Relay | Fetch-side only; no push-side reachability impact |
-| `no-progress`, `include-tag` | Common | Relay | |
-| `allow-tip-sha1-in-want`, `allow-reachable-sha1-in-want` | Host-dependent | Strip unless reachability-aware | Relay only where authorization is object-reachability-based (`01` §5.2); refname-only authorization + raw-OID wants is walkable |
-| `filter` (partial clone) | Increasingly common | Relay, revisit | Acceptable while fetch responses are uninspected; becomes a Strip if response-side inspection is ever specified |
-| `packfile-uris` | Rare | **Strip** | Content transits outside the proxied connection entirely (`01` §5.1); strip by default in all modes |
-| `symref` | Universal (HEAD advertisement) | Relay | |
+| Capability                                                 | Typical usage                       | Position                        | Notes                                                                                                                           |
+| ---------------------------------------------------------- | ----------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `multi_ack`, `multi_ack_detailed`, `no-done`               | Universal negotiation               | Relay                           |                                                                                                                                 |
+| `side-band`, `side-band-64k`                               | Universal                           | Relay                           | Band 3 remains available for intermediary error signalling (`01` §5.6)                                                          |
+| `thin-pack`                                                | Universal                           | Relay                           | Fetch direction; uninspected by design                                                                                          |
+| `shallow`, `deepen-since`, `deepen-not`, `deepen-relative` | CI and shallow clones — very common | Relay                           | Fetch-side only; no push-side reachability impact                                                                               |
+| `no-progress`, `include-tag`                               | Common                              | Relay                           |                                                                                                                                 |
+| `allow-tip-sha1-in-want`, `allow-reachable-sha1-in-want`   | Host-dependent                      | Strip unless reachability-aware | Relay only where authorization is object-reachability-based (`01` §5.2); refname-only authorization + raw-OID wants is walkable |
+| `filter` (partial clone)                                   | Increasingly common                 | Relay, revisit                  | Acceptable while fetch responses are uninspected; becomes a Strip if response-side inspection is ever specified                 |
+| `packfile-uris`                                            | Rare                                | **Strip**                       | Content transits outside the proxied connection entirely (`01` §5.1); strip by default in all modes                             |
+| `symref`                                                   | Universal (HEAD advertisement)      | Relay                           |                                                                                                                                 |
 
 ## 5. Protocol v2 (fetch side)
 
-| Item | Typical usage | Position | Notes |
-| --- | --- | --- | --- |
-| `ls-refs` | Universal | Relay | Apply ref-visibility filtering here if any is in force |
-| `fetch` | Universal | Relay | Same argument treatment as §4 (`filter`, `packfile-uris` args mirror the capability positions above) |
-| `object-info` | Rare (client tooling) | **Refuse** by default | Leaks object sizes without transferring content (`01` §5.9); enable per explicit configuration |
-| `server-option` | Advertised by major hosts | TODO | v2's generic client→server option channel — same policy questions as `push-options` |
-| `sideband-all` | Host-dependent | TODO | Changes response framing the intermediary must re-frame; verify before relaying |
-| `wait-for-done` | Rare | TODO | |
-| `session-id` | Modern hosts | Relay | Passed through unchanged |
-| unknown v2 commands | — | **Refuse** | CP-1 applied to the command list: the v2 command surface is an allowlist |
+| Item                | Typical usage             | Position              | Notes                                                                                                |
+| ------------------- | ------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------- |
+| `ls-refs`           | Universal                 | Relay                 | Apply ref-visibility filtering here if any is in force                                               |
+| `fetch`             | Universal                 | Relay                 | Same argument treatment as §4 (`filter`, `packfile-uris` args mirror the capability positions above) |
+| `object-info`       | Rare (client tooling)     | **Refuse** by default | Leaks object sizes without transferring content (`01` §5.9); enable per explicit configuration       |
+| `server-option`     | Advertised by major hosts | TODO                  | v2's generic client→server option channel — same policy questions as `push-options`                  |
+| `sideband-all`      | Host-dependent            | TODO                  | Changes response framing the intermediary must re-frame; verify before relaying                      |
+| `wait-for-done`     | Rare                      | TODO                  |                                                                                                      |
+| `session-id`        | Modern hosts              | Relay                 | Passed through unchanged                                                                             |
+| unknown v2 commands | —                         | **Refuse**            | CP-1 applied to the command list: the v2 command surface is an allowlist                             |
 
 ## 6. Conformance consequences
 
@@ -155,13 +155,13 @@ intermediary MUST NOT advertise what the upstream cannot honour.
 Live advertisement sample, 2026-08-09, github.com (coopernetes/test-repo):
 
 - receive-pack: `report-status report-status-v2 delete-refs
-  side-band-64k ofs-delta atomic object-format=sha1 quiet agent=...
-  session-id=... push-options`
+side-band-64k ofs-delta atomic object-format=sha1 quiet agent=...
+session-id=... push-options`
 - upload-pack v0: `multi_ack thin-pack side-band side-band-64k ofs-delta
-  shallow deepen-since deepen-not deepen-relative no-progress
-  include-tag multi_ack_detailed allow-tip-sha1-in-want
-  allow-reachable-sha1-in-want no-done symref=HEAD:... filter
-  object-format=sha1 agent=...`
+shallow deepen-since deepen-not deepen-relative no-progress
+include-tag multi_ack_detailed allow-tip-sha1-in-want
+allow-reachable-sha1-in-want no-done symref=HEAD:... filter
+object-format=sha1 agent=...`
 - v2: `ls-refs=unborn`, `fetch=shallow wait-for-done filter`,
   `server-option`, `object-format=sha1`
 
@@ -175,4 +175,3 @@ is not theoretical. No `packfile-uris` in either advertisement. No
 `sideband-all`.
 
 </details>
-

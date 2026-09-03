@@ -1,11 +1,34 @@
-# Policy-Enforcing Git Proxy — Draft Specification
+# Policy-Enforcing Git Proxy — Specification
 
 **Status:** Draft.
 
 A policy-enforcing Git proxy is a reverse proxy between a Git client and an
-upstream Git server that can refuse, defer, or permit operations according
-to policy. This specification admits multiple independent implementations,
-including minimal ones that implement only the protocol-conformance class.
+upstream Git server that can validate a `git receive-pack`, reject based on
+policy, defer forwarding as part of a policy-enforcing workflow (async outside
+of the lifecycle of a single `git push`, or permit operations through according
+to policy if a push is compliant. This specification defines the general
+behaviour and shared voculabulary to allow for multiple independent
+implementations.
+
+The target user base for a network-based intermediary to intercept and enforce
+policy on git data includes regulated industries (finance, health care,
+goverment agencies) with sensitives for intellectual property theft as well
+as any large organization who relies on Git source code repositories and
+wishes to enforce policy in a way that is agnostic of the underlying git
+server ("SCM provider").
+
+This spec strives to establish a baseline that allows for a minimal
+policy-enforcing git proxy that implement only the protocol-conformance class
+or full-blown gateways which add additional functionality on top of the core
+proxying capabilities.
+
+It assumes that any conformant system is compatible with an un-modified,
+stock `git` client and requires no specialized client that a user wouldn't
+already have access to from their operating system distribution (popular Linux
+distributions such as Ubuntu or Fedora, Windows, MacOS, etc. all provide `git`
+as an installable package). Servers are classified as conformant with this spec
+similarly. There are some additional features which are _not_ git centric on
+popular repository providers that this spec defines but does not mandate.
 
 ## Goals
 
@@ -36,8 +59,6 @@ against one product's feature names.
 
 ## Non-goals
 
-- Not an architecture standard: nothing here mandates process topology,
-  storage, libraries, language, or runtime.
 - Not a wire-protocol change: where the Git protocol itself would need
   extending (e.g. a machine-readable deferral signal), the path is an
   upstream proposal to the Git project, not a clause here.
@@ -45,16 +66,16 @@ against one product's feature names.
 
 ## Document set
 
-| Document | Contents |
-| --- | --- |
-| `01-scope-and-method.md` | Scope, conformance classes, protocol baseline, derivation method |
-| `02-push-approval-state-machine.md` | Push lifecycle: canonical states, transitions, evidence (`LC-n`) |
-| `03-deferral-interaction-models.md` | The pending window on the wire: held-connection and reject-and-retry models (`DF-n`) |
-| `04-record-field-sets.md` | Push record, audit view, and fetch record field sets (`PR-n`, `AU-n`, `FR-n`) |
-| `05-capability-positions.md` | Per-capability mediation positions (`CP-n`) |
-| `06-policy-hook-contract.md` | Policy decision contract and the optional external decision protocol (`HK-n`) |
-| `07-identity-resolution.md` | Pusher and commit-metadata identity; resolution requirements (`ID-n`) |
-| `08-scm-capabilities.md` | Informative: what upstream SCM platforms offer (identity APIs, OAuth, namespaces), mapped to the capability-conditional features |
+| Document                            | Contents                                                                                                                         |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `01-scope-and-method.md`            | Scope, conformance classes, protocol baseline, derivation method                                                                 |
+| `02-push-approval-state-machine.md` | Push lifecycle: canonical states, transitions, evidence (`LC-n`)                                                                 |
+| `03-deferral-interaction-models.md` | The pending window on the wire: held-connection and reject-and-retry models (`DF-n`)                                             |
+| `04-record-field-sets.md`           | Push record, audit view, and fetch record field sets (`PR-n`, `AU-n`, `FR-n`)                                                    |
+| `05-capability-positions.md`        | Per-capability mediation positions (`CP-n`)                                                                                      |
+| `06-policy-hook-contract.md`        | Policy decision contract and the optional external decision protocol (`HK-n`)                                                    |
+| `07-identity-resolution.md`         | Pusher and commit-metadata identity; resolution requirements (`ID-n`)                                                            |
+| `08-scm-capabilities.md`            | Informative: what upstream SCM platforms offer (identity APIs, OAuth, namespaces), mapped to the capability-conditional features |
 
 ## Conformance language
 
@@ -105,4 +126,3 @@ baseline for everything Git already specifies (`01`, §9).
 
 - **OCI Distribution Specification** — comparison point for the scope
   decision on routes vs. protocol behaviour (`01`, §7).
-

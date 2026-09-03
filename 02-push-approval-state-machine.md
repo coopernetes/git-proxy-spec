@@ -27,16 +27,16 @@ BCP 14 (`00-overview.md`).
 
 ## 2. Canonical states
 
-| State | Meaning | Terminal |
-| --- | --- | --- |
-| `received` | Submission accepted for evaluation; nothing yet decided | no |
-| `processing` | Policy evaluation in progress | no |
-| `pending` | Reviewable submission awaiting a decision | no |
-| `approved` | A decision to permit exists; upstream transfer not yet complete | no |
-| `forwarded` | Upstream accepted the submission | yes |
-| `rejected` | Denied — by policy or by a reviewer | yes |
-| `canceled` | Resolved without a decision on the content: withdrawn, client gone, or review window expired | yes |
-| `error` | The submission could not be processed safely; fail-closed | yes |
+| State        | Meaning                                                                                      | Terminal |
+| ------------ | -------------------------------------------------------------------------------------------- | -------- |
+| `received`   | Submission accepted for evaluation; nothing yet decided                                      | no       |
+| `processing` | Policy evaluation in progress                                                                | no       |
+| `pending`    | Reviewable submission awaiting a decision                                                    | no       |
+| `approved`   | A decision to permit exists; upstream transfer not yet complete                              | no       |
+| `forwarded`  | Upstream accepted the submission                                                             | yes      |
+| `rejected`   | Denied — by policy or by a reviewer                                                          | yes      |
+| `canceled`   | Resolved without a decision on the content: withdrawn, client gone, or review window expired | yes      |
+| `error`      | The submission could not be processed safely; fail-closed                                    | yes      |
 
 State names are lowercase in normative text. Internal representation is
 non-normative — an enum, a set of flags, or anything else — provided LC-1
@@ -44,18 +44,18 @@ holds.
 
 ## 3. Legal transitions
 
-| From | To | Trigger | Required evidence on the record |
-| --- | --- | --- | --- |
-| *(start)* | `received` | submission accepted for evaluation | submission metadata (repository, refs, submitter identity, timestamp) |
-| `received` | `processing` | evaluation begins | — |
-| `processing` | `rejected` | hard policy violation | automated attestation: violated rule(s), reason |
-| `processing` | `pending` | all hard checks passed | evaluation results (per-check outcomes) |
-| `processing` | `error` | evaluation could not complete, or the lifecycle record could not be persisted | error cause |
-| `pending` | `approved` | authorized decision to permit (reviewer attestation, or auto-approval policy) | attestation; `automated` actor type when auto-approved |
-| `pending` | `rejected` | authorized decision to deny | attestation with reason |
-| `pending` | `canceled` | withdrawal by an authorized actor, client disconnect, or review-window expiry | attestation with reason; `automated` actor type for disconnect/expiry |
-| `approved` | `forwarded` | upstream accepted the transfer | upstream result |
-| `approved` | `error` | forwarding to upstream failed | error cause |
+| From         | To           | Trigger                                                                       | Required evidence on the record                                       |
+| ------------ | ------------ | ----------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| _(start)_    | `received`   | submission accepted for evaluation                                            | submission metadata (repository, refs, submitter identity, timestamp) |
+| `received`   | `processing` | evaluation begins                                                             | —                                                                     |
+| `processing` | `rejected`   | hard policy violation                                                         | automated attestation: violated rule(s), reason                       |
+| `processing` | `pending`    | all hard checks passed                                                        | evaluation results (per-check outcomes)                               |
+| `processing` | `error`      | evaluation could not complete, or the lifecycle record could not be persisted | error cause                                                           |
+| `pending`    | `approved`   | authorized decision to permit (reviewer attestation, or auto-approval policy) | attestation; `automated` actor type when auto-approved                |
+| `pending`    | `rejected`   | authorized decision to deny                                                   | attestation with reason                                               |
+| `pending`    | `canceled`   | withdrawal by an authorized actor, client disconnect, or review-window expiry | attestation with reason; `automated` actor type for disconnect/expiry |
+| `approved`   | `forwarded`  | upstream accepted the transfer                                                | upstream result                                                       |
+| `approved`   | `error`      | forwarding to upstream failed                                                 | error cause                                                           |
 
 ## 4. Requirements
 
@@ -138,7 +138,7 @@ canonical states (e.g. `RECEIVED` → `received`, `PROCESSING` →
 `blocked`, `error`, `rejected`, `authorised`, `canceled`) can satisfy LC-1
 only if the derivation to a canonical state is total and unambiguous —
 including `pending`, which in such representations is typically the
-*absence* of every terminal flag plus a waiting marker. The derivation
+_absence_ of every terminal flag plus a waiting marker. The derivation
 function is part of the implementation's conformance claim and must be
 documented. A single flag covering both "denied by a check" and "awaiting
 review" cannot satisfy LC-4, since the two are not derivable from it.
@@ -195,9 +195,8 @@ everything the spec needs.
   evaluation never started)? Is `received` → `canceled` needed (client
   disconnects mid-transfer)? The table currently says no; confirm against
   implementation behaviour before freezing.
-- **Name normativity.** Are the canonical state *names* themselves
+- **Name normativity.** Are the canonical state _names_ themselves
   normative for API interchange (a conforming API must literally say
   `pending`), or only the semantics plus a documented mapping? The audit
   portability goal argues for literal names; decide when drafting the
   record field sets.
-

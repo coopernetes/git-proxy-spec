@@ -24,7 +24,7 @@ git server offers none of the API-backed capabilities.
   presented credential (a PAT or bearer token) to the account it belongs
   to. This is what lets the intermediary resolve the pusher from the
   credential rather than the presented username (`07` ID-2, ID-3).
-- **Key identity resolution** — an endpoint listing a *named* account's
+- **Key identity resolution** — an endpoint listing a _named_ account's
   registered SSH public keys (`.../users/{login}/keys`). Because the login
   is an input, this endpoint **confirms rather than discovers**: the
   intermediary must already hold candidate logins for the pusher, fetch
@@ -58,13 +58,13 @@ git server offers none of the API-backed capabilities.
 
 ## 2. Platform matrix
 
-| Platform | Token identity | Key identity | OAuth linking | Verified email | Namespace |
-| --- | --- | --- | --- | --- | --- |
-| GitHub | yes (`GET /user`) | yes (`GET /users/{login}/keys`) | yes | weak — often absent by privacy default | `owner/repo` |
-| GitLab | yes (`GET /api/v4/user`) | yes (`username → id → /keys`) | yes | yes (primary email) | `group[/subgroup…]/repo` (nested) |
-| Forgejo / Gitea | yes (`GET /api/v1/user`) | yes (`GET /api/v1/users/{login}/keys`) | yes | yes (login and email) | `owner/repo` |
-| Bitbucket | yes (`GET /2.0/user`) | no | yes | account email is the lookup input | `workspace/repo` |
-| Bare git server | no | no | no | no | path only, no semantic namespace |
+| Platform        | Token identity           | Key identity                           | OAuth linking | Verified email                         | Namespace                         |
+| --------------- | ------------------------ | -------------------------------------- | ------------- | -------------------------------------- | --------------------------------- |
+| GitHub          | yes (`GET /user`)        | yes (`GET /users/{login}/keys`)        | yes           | weak — often absent by privacy default | `owner/repo`                      |
+| GitLab          | yes (`GET /api/v4/user`) | yes (`username → id → /keys`)          | yes           | yes (primary email)                    | `group[/subgroup…]/repo` (nested) |
+| Forgejo / Gitea | yes (`GET /api/v1/user`) | yes (`GET /api/v1/users/{login}/keys`) | yes           | yes (login and email)                  | `owner/repo`                      |
+| Bitbucket       | yes (`GET /2.0/user`)    | no                                     | yes           | account email is the lookup input      | `workspace/repo`                  |
+| Bare git server | no                       | no                                     | no            | no                                     | path only, no semantic namespace  |
 
 Every hosted platform above provides an OAuth2 flow, so establishing the
 pusher-to-account link is straightforward wherever one of them is the

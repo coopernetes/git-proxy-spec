@@ -1,0 +1,10 @@
+# Prefer an already-active node (mise-activated shell); otherwise fall back
+# to mise so commits from IDEs/non-login shells still resolve the toolchain.
+if command -v npx >/dev/null 2>&1; then
+  npx lint-staged
+elif command -v mise >/dev/null 2>&1; then
+  mise exec -- npx lint-staged
+else
+  echo "pre-commit: node/npx not found on PATH and mise unavailable" >&2
+  exit 1
+fi

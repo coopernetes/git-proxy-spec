@@ -15,7 +15,7 @@ conflated.
 - **The pusher** — the principal authenticated on the connection to the
   intermediary. This is the identity that maps to access on the upstream:
   it is established by credential material the client must possess. It is
-  *the* identity for authorization and approval.
+  _the_ identity for authorization and approval.
 - **Commit metadata identity** — the author and committer recorded in each
   commit object. This is self-asserted content: it is written by whoever
   produced the commit, is not authenticated by anything, and legitimately
@@ -188,4 +188,3 @@ conforms; the mechanism gap stays here, out of spec text, per the
 functional-register rule.
 
 </details>
-

@@ -33,12 +33,12 @@ Defines how a policy decision is reached and expressed, in two layers:
 A decision point running inside the intermediary is reached through a
 programming interface, which this specification does not constrain
 (`01` §7 — internal structure is not observable). What it constrains is
-the *contract*: what the decision point is guaranteed to receive, what it
+the _contract_: what the decision point is guaranteed to receive, what it
 is permitted to return, and how the host treats each return. That
 contract is observable — it is verifiable by submitting pushes and
 observing dispositions — and is specified in §3.
 
-A decision point running *outside* the intermediary is reached over a
+A decision point running _outside_ the intermediary is reached over a
 wire protocol, which is fully observable and therefore specifiable end to
 end. That protocol is optional and specified in §4.
 
@@ -68,13 +68,13 @@ a transparent-proxy filter chain.
 
 A verdict is exactly one of:
 
-| Verdict | Meaning |
-| --- | --- |
-| `pass` | The submission satisfies this decision point's rule |
-| `violation` | The submission breaks the rule; carries at least one finding |
+| Verdict         | Meaning                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------- |
+| `pass`          | The submission satisfies this decision point's rule                                                 |
+| `violation`     | The submission breaks the rule; carries at least one finding                                        |
 | `could-not-run` | The decision point could not reach a conclusion (dependency unavailable, misconfiguration, timeout) |
-| `defer` | The submission requires human review before it may proceed |
-| `allow` | The submission may proceed without human review |
+| `defer`         | The submission requires human review before it may proceed                                          |
+| `allow`         | The submission may proceed without human review                                                     |
 
 **HK-3** — A decision point is granted authority over a subset of the
 vocabulary, fixed by its role and known to the host:
@@ -255,7 +255,7 @@ git-proxy `processors/push-action/preReceive.ts`: `spawnSync` of
 `./hooks/pre-receive.sh`, stdin = `commitFrom commitTo branch`, verdict
 by exit code — 0 approve, 1 reject, 2 manual-review, other error;
 Unix-only; `isCollectible = true`. The transport (local shell subprocess)
-is not portable and not spec-able; the *verdict vocabulary* is, and
+is not portable and not spec-able; the _verdict vocabulary_ is, and
 sourced §3.2's `allow`/`violation`(reject)/`defer`(review)/`could-not-run`
 four-way and HK-3's routing-authority split (a hook can route, a check
 cannot). fogwall has NO external decision hook — `GitleaksRunner` shells
@@ -267,4 +267,3 @@ Keep this comparison internal per the functional-register /finos-tone
 rules; §§1-6 above carry only functional statements.
 
 </details>
-

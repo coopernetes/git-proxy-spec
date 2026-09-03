@@ -38,50 +38,50 @@ is immutable or versioned.
 
 ### 2.1 Submission identity and context
 
-| Field | Level | Notes |
-| --- | --- | --- |
-| `id` | MUST | Opaque, unique per submission; this is the correlation identifier (`03` §1) |
-| `receivedAt` | MUST | Timestamp of submission acceptance |
-| repository identity | MUST | The canonical identity of `01` §6.2 — namespace tuple or (host, slug); the raw request URL MAY be retained in addition |
-| target ref | MUST | Full ref name (`refs/heads/...`, `refs/tags/...`) |
-| old / new object ids | MUST | The commit range (`commitFrom` / `commitTo`); zero-id conventions denote ref creation and deletion |
-| submitter presented identity | MUST | The username presented to the intermediary |
-| submitter email | SHOULD | Where user management is in use |
-| resolved upstream identity | conditional MUST | Where the identity-resolution capability (`01` §6.1) is in use, both presented and resolved identity MUST be recorded; otherwise not applicable |
-| transport | SHOULD | e.g. `https` / `ssh`; MAY be derived, e.g. from a provider reference where each provider entry binds exactly one transport |
-| canonical state | MUST | Exactly one of the `02` §2 states (LC-1) |
+| Field                        | Level            | Notes                                                                                                                                           |
+| ---------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                         | MUST             | Opaque, unique per submission; this is the correlation identifier (`03` §1)                                                                     |
+| `receivedAt`                 | MUST             | Timestamp of submission acceptance                                                                                                              |
+| repository identity          | MUST             | The canonical identity of `01` §6.2 — namespace tuple or (host, slug); the raw request URL MAY be retained in addition                          |
+| target ref                   | MUST             | Full ref name (`refs/heads/...`, `refs/tags/...`)                                                                                               |
+| old / new object ids         | MUST             | The commit range (`commitFrom` / `commitTo`); zero-id conventions denote ref creation and deletion                                              |
+| submitter presented identity | MUST             | The username presented to the intermediary                                                                                                      |
+| submitter email              | SHOULD           | Where user management is in use                                                                                                                 |
+| resolved upstream identity   | conditional MUST | Where the identity-resolution capability (`01` §6.1) is in use, both presented and resolved identity MUST be recorded; otherwise not applicable |
+| transport                    | SHOULD           | e.g. `https` / `ssh`; MAY be derived, e.g. from a provider reference where each provider entry binds exactly one transport                      |
+| canonical state              | MUST             | Exactly one of the `02` §2 states (LC-1)                                                                                                        |
 
 ### 2.2 Content
 
-| Field | Level | Notes |
-| --- | --- | --- |
-| `commits[]` | MUST | Per commit: object id, parent id(s), author name and email, committer name and email, message, commit timestamp |
-| signature material | SHOULD | Commit signatures and sign-off trailers, where present |
-| annotated tag metadata | SHOULD | For tag pushes; ref *type* itself is derivable from the target ref name prefix and needs no separate field |
+| Field                  | Level  | Notes                                                                                                           |
+| ---------------------- | ------ | --------------------------------------------------------------------------------------------------------------- |
+| `commits[]`            | MUST   | Per commit: object id, parent id(s), author name and email, committer name and email, message, commit timestamp |
+| signature material     | SHOULD | Commit signatures and sign-off trailers, where present                                                          |
+| annotated tag metadata | SHOULD | For tag pushes; ref _type_ itself is derivable from the target ref name prefix and needs no separate field      |
 
 ### 2.3 Evaluation evidence
 
-| Field | Level | Notes |
-| --- | --- | --- |
-| `steps[]` | MUST | One entry per executed policy check |
-| step: name | MUST | Which check ran |
-| step: outcome | MUST | Three-way at minimum: passed / policy violation / could-not-run — the §6.1 distinction; a check that could not run MUST NOT be conflated with either pass or fail |
-| step: message | MUST | Human-readable result |
-| step: evidence content | SHOULD | Structured findings, diff excerpts, scanner output |
-| step: order and timestamp | SHOULD | Execution order explicit; per-step time feeds the audit view |
-| step: logs | MAY | |
+| Field                     | Level  | Notes                                                                                                                                                             |
+| ------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `steps[]`                 | MUST   | One entry per executed policy check                                                                                                                               |
+| step: name                | MUST   | Which check ran                                                                                                                                                   |
+| step: outcome             | MUST   | Three-way at minimum: passed / policy violation / could-not-run — the §6.1 distinction; a check that could not run MUST NOT be conflated with either pass or fail |
+| step: message             | MUST   | Human-readable result                                                                                                                                             |
+| step: evidence content    | SHOULD | Structured findings, diff excerpts, scanner output                                                                                                                |
+| step: order and timestamp | SHOULD | Execution order explicit; per-step time feeds the audit view                                                                                                      |
+| step: logs                | MAY    |                                                                                                                                                                   |
 
 ### 2.4 Decision evidence
 
-| Field | Level | Notes |
-| --- | --- | --- |
-| approval attestation | MUST on `approved` | Reviewer identity (username, email), timestamp, automated flag; question/answer content where attestation questions are configured (LC-6) |
-| rejection evidence | MUST on `rejected` | Actor type; reviewer identity when human; reason; timestamp (LC-5) |
-| cancellation evidence | MUST on `canceled` | Same shape as rejection (LC-5) |
-| self-approval override marker | MUST when exercised | LC-8: every use of the override identifiable as such |
-| error cause | MUST on `error` | LC-9 |
-| summary / blocked message | SHOULD | One-line disposition for list views |
-| `forwardedAt` | MUST on `forwarded` | Terminal transition time for the audit view |
+| Field                         | Level               | Notes                                                                                                                                     |
+| ----------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| approval attestation          | MUST on `approved`  | Reviewer identity (username, email), timestamp, automated flag; question/answer content where attestation questions are configured (LC-6) |
+| rejection evidence            | MUST on `rejected`  | Actor type; reviewer identity when human; reason; timestamp (LC-5)                                                                        |
+| cancellation evidence         | MUST on `canceled`  | Same shape as rejection (LC-5)                                                                                                            |
+| self-approval override marker | MUST when exercised | LC-8: every use of the override identifiable as such                                                                                      |
+| error cause                   | MUST on `error`     | LC-9                                                                                                                                      |
+| summary / blocked message     | SHOULD              | One-line disposition for list views                                                                                                       |
+| `forwardedAt`                 | MUST on `forwarded` | Terminal transition time for the audit view                                                                                               |
 
 **PR-2** — Attestation content shape (map vs. list, question wording) is
 non-normative. Each configured question and the reviewer's response to it
@@ -152,7 +152,7 @@ git-proxy-only: explicit protocol field (https|ssh) — correction: NOT a
 gap in fogwall; fogwall derives transport via PushRecord.provider → the
 provider entry's single URI scheme (one transport per provider entry).
 Sourced the reportable-content/derivation-stability note instead.
-tagData (annotated tag metadata) — genuinely gp-only; ref *type* is
+tagData (annotated tag metadata) — genuinely gp-only; ref _type_ is
 derivable in both (fogwall stores the full refname incl. refs/tags/ in
 `branch`, PushStorePersistenceHook builder.branch(cmd.getRefName())).
 capabilities[]; pullAuthStrategy; content-derived id
@@ -165,4 +165,3 @@ explicit transition-event log (both derive history from embedded
 evidence — hence AU-2).
 
 </details>
-

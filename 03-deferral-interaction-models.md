@@ -178,4 +178,3 @@ sequenceDiagram
   sideband works identically). Model R's `report-status` behaviour is
   transport-neutral, but denial semantics differ on SSH (`01` §5.5).
   Confirm both models specify cleanly for both transports before freezing.
-

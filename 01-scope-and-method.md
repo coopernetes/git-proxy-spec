@@ -6,19 +6,19 @@ The specification describes the **observable behaviour** of a Git reverse
 proxy that performs policy enforcement, plus the **policy management layer**
 beneath it (approvals, audit records, identity). It is written so that
 multiple independent implementations — including a minimal wireline-only
-proxy with no dashboard and no approval workflow — can conform, each to the
-conformance class matching its ambitions.
+proxy with no additional user interface and no approval workflow — can
+conform, each to the conformance class matching its ambitions.
 
 **Derivation.** The draft is derived from the observed behaviour of a
-working reference implementation, constrained to what is externally
-observable (§2). Behaviour found in other implementations is treated as
+working reference implementations, constrained to what is externally
+observable (§2). Behaviour found in any implementations is treated as
 prior art and evaluated for inclusion by the same criterion (§9).
 
 **The specification's own scope boundary:**
 
 > This specification does **not** specify the Git wire protocol. Git
-> specifies what a compliant *server* does. This document specifies what a
-> policy-enforcing *intermediary* does — behaviour that arises only because
+> specifies what a compliant _server_ does. This document specifies what a
+> policy-enforcing _intermediary_ does — behaviour that arises only because
 > something sits in the middle and can say no. Where the upstream Git
 > documentation is ambiguous or incomplete, we file upstream rather than
 > specify around it.
@@ -43,7 +43,7 @@ that the push was refused, and why.
 
 ## 3. Conformance classes
 
-### Class P — Protocol conformance (mandatory for every implementation)
+### Class P — Protocol conformance (mandatory)
 
 Correct Git smart-protocol behaviour through an intermediary: the
 normative reference (§4) plus the proxy delta (§5). Every conforming
@@ -63,14 +63,17 @@ compliance auditor trust any conforming implementation equally:
 - Deferral interaction models (`03`)
 - Identity/authorization concepts referenced by the above
 
-Storage engine, schema DDL, table layout, and dashboard design are **out of
-scope**. An implementation claiming Class A also claims Class P.
+An implementation claiming Class A also claims Class P.
 
 ### Out of scope entirely
 
-- Dashboard / UI of any kind
+- Any UI of any kind that exists to fulfill a specific policy-driven workflow
+  such as review, approvals, etc. Only the builtin `git` client capabilities
+  are described in any detail. Implementations are free to add this onto a
+  conformant proxy & audit system for usability purposes.
 - Specific content scanners (secret scanning, OCR/PII, DLP integrations)
-- SCM OAuth integrations and API proxying (PR creation, issue management)
+- 3rd party integrations (OAuth, "Apps", etc)
+- API proxying (PR/MR creation, issue management)
 - Availability and performance functions — caching, rate limiting, quota
   enforcement — including the recording and audit of the decisions they
   make. The audit model of this specification (`04`) covers policy
@@ -80,17 +83,17 @@ scope**. An implementation claiming Class A also claims Class P.
 
 ---
 
-## 4. Class P — Normative reference (do not restate)
+## 4. Class P — Normative reference
 
 A conforming implementation MUST correctly implement the Git smart protocol
 over HTTPS and SSH, as defined by:
 
-| Document | Covers |
-| --- | --- |
-| `gitprotocol-http(5)` | Git over HTTP: ref discovery, URL format, auth, session state, status codes |
-| `gitprotocol-v2(5)` | v2 command-oriented protocol, capability advertisement, `ls-refs`/`fetch`/`object-info` |
-| `gitprotocol-pack(5)` | pkt-line framing, v0/v1 exchange |
-| `gitprotocol-capabilities(5)` | v0/v1 capability semantics |
+| Document                      | Covers                                                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| `gitprotocol-http(5)`         | Git over HTTP: ref discovery, URL format, auth, session state, status codes             |
+| `gitprotocol-v2(5)`           | v2 command-oriented protocol, capability advertisement, `ls-refs`/`fetch`/`object-info` |
+| `gitprotocol-pack(5)`         | pkt-line framing, v0/v1 exchange                                                        |
+| `gitprotocol-capabilities(5)` | v0/v1 capability semantics                                                              |
 
 These documents are referenced, not restated; a copy here would only drift
 from the originals.
@@ -129,7 +132,7 @@ encoding one implementation's reading into this spec.**
 
 ## 5. Class P — The proxy delta (normative, MUST)
 
-Behaviour that exists *only* because an intermediary is present. None of it
+Behaviour that exists _only_ because an intermediary is present. None of it
 is specified upstream; all of it is externally testable.
 
 ### 5.1 Capability advertisement mediation — highest priority
@@ -137,10 +140,10 @@ is specified upstream; all of it is externally testable.
 The proxy relays the upstream capability advertisement. Two capabilities
 are outright **policy-bypass vectors**:
 
-| Capability | Bypass risk |
-| --- | --- |
-| `packfile-uris` | Server returns URIs the client downloads over http/https *in place of objects in the packfile*. That content never transits the proxy and is never scanned. |
-| `filter` (partial clone) | Objects omitted from the pack; changes what the proxy can observe and inspect. |
+| Capability               | Bypass risk                                                                                                                                                 |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packfile-uris`          | Server returns URIs the client downloads over http/https _in place of objects in the packfile_. That content never transits the proxy and is never scanned. |
+| `filter` (partial clone) | Objects omitted from the pack; changes what the proxy can observe and inspect.                                                                              |
 
 Also requiring a stated position: `sideband-all`, `shallow`/`deepen*`,
 `thin-pack` (bases not present in the pack), `object-format`.
@@ -450,7 +453,7 @@ Two operations consume the identity, with different strictness:
 > **Submission binding.** Artifacts attached to a specific submission —
 > approval consumption (`03` DF-10) above all — MUST bind by exact
 > equality of canonical identity, never by pattern match. Entitlement
-> *grants* may be pattern-scoped as rules; the *consumption* of a
+> _grants_ may be pattern-scoped as rules; the _consumption_ of a
 > decision about one submission may not.
 
 ---
@@ -459,19 +462,19 @@ Two operations consume the identity, with different strictness:
 
 Each of these is a good engineering opinion and a bad specification clause.
 
-| Item | Why excluded |
-| --- | --- |
-| Specific URL paths | `$GIT_URL` is opaque upstream. Mandating a route would be narrower than Git itself permits. |
-| Process topology (single server vs. two ports/apps) | No observable-behaviour consequence. Non-normative note at most. |
-| Library choices | Implementation trade-offs. The spec cares that the capability works to a defined bar. |
-| Storage engine / DB abstraction | Record *shape* is normative; persistence mechanism is not. |
-| Restatement of pkt-line framing, negotiation, pack format | Normative reference only (§4). |
-| Language or runtime | No observable-behaviour consequence. |
+| Item                                                      | Why excluded                                                                                |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Specific URL paths                                        | `$GIT_URL` is opaque upstream. Mandating a route would be narrower than Git itself permits. |
+| Process topology (single server vs. two ports/apps)       | No observable-behaviour consequence. Non-normative note at most.                            |
+| Library choices                                           | Implementation trade-offs. The spec cares that the capability works to a defined bar.       |
+| Storage engine / DB abstraction                           | Record _shape_ is normative; persistence mechanism is not.                                  |
+| Restatement of pkt-line framing, negotiation, pack format | Normative reference only (§4).                                                              |
+| Language or runtime                                       | No observable-behaviour consequence.                                                        |
 
 **On the OCI comparison:** OCI specifies its distribution API because
 third-party clients depend on those endpoints. Here the Git client already
 speaks a fixed protocol — it needs correct behaviour, not a particular
-route layout. Specify protocol *behaviour*, not routes.
+route layout. Specify protocol _behaviour_, not routes.
 
 ---
 
@@ -503,7 +506,7 @@ running code and prevents the specification drifting from practice.
 
 **The one exception — security-critical proxy-delta items.** Some §5 items
 (capability filtering, dumb-protocol refusal) are plausibly implemented by
-*no* current implementation. They are normative anyway. The carve-out is
+_no_ current implementation. They are normative anyway. The carve-out is
 narrow: these requirements are derived from Git's own documented protocol
 surface and describe bypass vectors of the proxy's entire reason for
 existing — not product features. Product-feature aspirations (e.g.
@@ -513,10 +516,9 @@ non-normative until implemented.
 **Inventory partition rule** (for auditing any implementation against the
 draft):
 
-| Finding | Becomes |
-| --- | --- |
-| Behaviour present in the reference implementation | Candidate MUST |
-| Present only in another implementation | Candidate SHOULD; evaluate for inclusion |
-| Present in no implementation, security-critical proxy-delta | MUST (the §9 carve-out) |
-| Present in no implementation, product feature | Non-normative proposed extension |
-
+| Finding                                                     | Becomes                                  |
+| ----------------------------------------------------------- | ---------------------------------------- |
+| Behaviour present in the reference implementation           | Candidate MUST                           |
+| Present only in another implementation                      | Candidate SHOULD; evaluate for inclusion |
+| Present in no implementation, security-critical proxy-delta | MUST (the §9 carve-out)                  |
+| Present in no implementation, product feature               | Non-normative proposed extension         |
