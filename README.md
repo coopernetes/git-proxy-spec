@@ -1,14 +1,12 @@
 # git-proxy-spec
 
-A working draft specification for a **policy-enforcing Git proxy** — a
-reverse proxy that sits between a Git client and an upstream Git server and
-can refuse, defer, or permit operations according to policy, while
-producing a portable audit trail of every decision.
+A working draft specification for a **policy-enforcing Git proxy** — a reverse proxy that sits between a Git client and
+an upstream Git server and can refuse, defer, or permit operations according to policy, while producing a portable audit
+trail of every decision.
 
-The specification is written against _observable behaviour_, so that
-multiple independent implementations can conform, each to the conformance
-class matching its ambitions. It does not restate the Git wire protocol; it
-specifies the behaviour that exists only because an intermediary is present.
+The specification is written against _observable behaviour_, so that multiple independent implementations can conform,
+each to the conformance class matching its ambitions. It does not restate the Git wire protocol; it specifies the
+behaviour that exists only because an intermediary is present.
 
 ## Status
 
@@ -16,8 +14,8 @@ Draft. Wording, structure, and open questions are all in motion.
 
 ## How to read it
 
-Start with **[00-overview.md](00-overview.md)** — the document map, the
-conformance-keyword conventions (BCP 14), the goals, and the references.
+Start with **[00-overview.md](00-overview.md)** — the document map, the conformance-keyword conventions (BCP 14), the
+goals, and the references.
 
 | Document                                                               | Contents                                                                                                                |
 | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -33,16 +31,13 @@ conformance-keyword conventions (BCP 14), the goals, and the references.
 
 ## A note on the working notes
 
-Several documents carry collapsed **internal working notes** (fenced
-`<details>` blocks labelled _"remove before any publication"_). These hold
-derivation analysis and are tracked deliberately, not published prose. See
-[PUBLISHING.md](PUBLISHING.md) before making this repository, or any
-document in it, public.
+Several documents carry collapsed **internal working notes** (fenced `<details>` blocks labelled _"remove before any
+publication"_). These hold derivation analysis and are tracked deliberately, not published prose. See
+[PUBLISHING.md](PUBLISHING.md) before making this repository, or any document in it, public.
 
 ## Contributing
 
-[CONTRIBUTING.md](CONTRIBUTING.md) covers the drafting discipline and
-tracks remaining work.
+[CONTRIBUTING.md](CONTRIBUTING.md) covers the drafting discipline and tracks remaining work.
 
 ## Licence
 

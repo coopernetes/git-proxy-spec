@@ -1,10 +1,8 @@
 # Capability Mediation
 
-Elaborates `01` §5.1 into per-capability positions. Conformance keywords
-per BCP 14 (`00-overview.md`). Requirement IDs: `CP-n`. Source documents:
-`gitprotocol-capabilities(5)` (v0/v1), `gitprotocol-v2(5)`. Positions
-marked **TODO** are deliberately unresolved pending protocol research or a
-design decision.
+Elaborates `01` §5.1 into per-capability positions. Conformance keywords per BCP 14 (`00-overview.md`). Requirement IDs:
+`CP-n`. Source documents: `gitprotocol-capabilities(5)` (v0/v1), `gitprotocol-v2(5)`. Positions marked **TODO** are
+deliberately unresolved pending protocol research or a design decision.
 
 ## 1. Position vocabulary
 
@@ -18,66 +16,49 @@ design decision.
 
 ## 2. Default rules
 
-**CP-1** — **Fidelity by default.** In a transparent relay, the upstream
-advertisement passes through unmodified except for the positions
-enumerated in this document. Every Strip or Refuse position MUST be
-justified by one of exactly two grounds: (a) it closes a channel by
-which content evades inspection or authorization, or (b) the
-intermediary cannot correctly process the capability's effect on the
-stream it must parse. Modifying the advertisement on any other ground is
-a conformance failure.
+**CP-1** — **Fidelity by default.** In a transparent relay, the upstream advertisement passes through unmodified except
+for the positions enumerated in this document. Every Strip or Refuse position MUST be justified by one of exactly two
+grounds: (a) it closes a channel by which content evades inspection or authorization, or (b) the intermediary cannot
+correctly process the capability's effect on the stream it must parse. Modifying the advertisement on any other ground
+is a conformance failure.
 
-**CP-2** — Stripping MUST operate on the advertisement in both
-directions where applicable (server capability lines, v2 capability
-advertisement), and a stripped capability attempted by a client anyway
-MUST result in a protocol-valid error, not undefined behaviour.
+**CP-2** — Stripping MUST operate on the advertisement in both directions where applicable (server capability lines, v2
+capability advertisement), and a stripped capability attempted by a client anyway MUST result in a protocol-valid error,
+not undefined behaviour.
 
 ### 2.1 The subset principle, per proxy mode
 
-Two proxy modes negotiate capabilities differently, and the subset
-relationship to the upstream differs accordingly.
+Two proxy modes negotiate capabilities differently, and the subset relationship to the upstream differs accordingly.
 
-**CP-5** — In a transparent relay, the client-facing advertisement MUST
-be a subset of the upstream's own advertisement: the intermediary
-filters, it never adds.
+**CP-5** — In a transparent relay, the client-facing advertisement MUST be a subset of the upstream's own advertisement:
+the intermediary filters, it never adds.
 
-**CP-6** — In a store-and-forward mode there are two independent
-negotiations — client↔intermediary and intermediary↔upstream — and the
-client-facing advertisement is the intermediary's own. Capabilities
-divide into two kinds:
+**CP-6** — In a store-and-forward mode there are two independent negotiations — client↔intermediary and
+intermediary↔upstream — and the client-facing advertisement is the intermediary's own. Capabilities divide into two
+kinds:
 
-- **Connection-local** — properties of one hop, free to differ between
-  hops: `side-band`/`side-band-64k`, `quiet`, `no-progress`, `agent`,
-  `ofs-delta`, thin-pack transfer, negotiation capabilities. An
-  intermediary MAY offer these to the client regardless of the
-  upstream's advertisement (this is what enables intermediary-generated
-  progress streaming).
-- **End-to-end** — promises about the upstream repository or about what
-  reaches it: `object-format`, `atomic`, `delete-refs`, `push-options`,
-  `push-cert`, and on the fetch side `filter` and `packfile-uris`. An
-  intermediary MUST NOT offer an end-to-end capability to the client
-  unless it can honour it against the configured upstream — for these,
+- **Connection-local** — properties of one hop, free to differ between hops: `side-band`/`side-band-64k`, `quiet`,
+  `no-progress`, `agent`, `ofs-delta`, thin-pack transfer, negotiation capabilities. An intermediary MAY offer these to
+  the client regardless of the upstream's advertisement (this is what enables intermediary-generated progress
+  streaming).
+- **End-to-end** — promises about the upstream repository or about what reaches it: `object-format`, `atomic`,
+  `delete-refs`, `push-options`, `push-cert`, and on the fetch side `filter` and `packfile-uris`. An intermediary MUST
+  NOT offer an end-to-end capability to the client unless it can honour it against the configured upstream — for these,
   the subset rule of CP-5 applies in every mode.
 
-A store-and-forward advertisement is an allowlist by construction — the
-intermediary offers what its own server implementation supports — so no
-fail-closed rule is needed there.
+A store-and-forward advertisement is an allowlist by construction — the intermediary offers what its own server
+implementation supports — so no fail-closed rule is needed there.
 
-**CP-7** — **Unknown capabilities.** In a transparent relay, a
-capability the implementation does not recognize is relayed by default:
-content enforcement happens at the pack layer, which fails closed on
-input it cannot parse, and stripping unknowns by default would freeze
-protocol evolution for every client behind the intermediary. An
-implementation MAY offer a strict mode that strips unrecognized
-capabilities where its inspection guarantees depend on full
-comprehension of the negotiated stream; strict mode is explicit
-configuration, not the default.
+**CP-7** — **Unknown capabilities.** In a transparent relay, a capability the implementation does not recognize is
+relayed by default: content enforcement happens at the pack layer, which fails closed on input it cannot parse, and
+stripping unknowns by default would freeze protocol evolution for every client behind the intermediary. An
+implementation MAY offer a strict mode that strips unrecognized capabilities where its inspection guarantees depend on
+full comprehension of the negotiated stream; strict mode is explicit configuration, not the default.
 
 ## 3. receive-pack (push) — the core service
 
-The baseline tier is what a stock `git push` over HTTPS or SSH exercises
-against any mainstream host: `report-status`, `side-band-64k`,
-`delete-refs`, `ofs-delta`, `quiet`, `agent`, and thin-pack transfer.
+The baseline tier is what a stock `git push` over HTTPS or SSH exercises against any mainstream host: `report-status`,
+`side-band-64k`, `delete-refs`, `ofs-delta`, `quiet`, `agent`, and thin-pack transfer.
 
 | Capability         | Typical usage                                  | Position                   | Notes                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ---------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -97,9 +78,8 @@ against any mainstream host: `report-status`, `side-band-64k`,
 
 ## 4. upload-pack (fetch) — v0/v1
 
-Fetch payload flows upstream→client and is deliberately uninspected
-(`01` §5.7 boundary discussion); most fetch capabilities therefore
-Relay. The exceptions are the bypass vectors of `01` §5.1.
+Fetch payload flows upstream→client and is deliberately uninspected (`01` §5.7 boundary discussion); most fetch
+capabilities therefore Relay. The exceptions are the bypass vectors of `01` §5.1.
 
 | Capability                                                 | Typical usage                       | Position                        | Notes                                                                                                                           |
 | ---------------------------------------------------------- | ----------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
@@ -128,50 +108,37 @@ Relay. The exceptions are the bypass vectors of `01` §5.1.
 
 ## 6. Conformance consequences
 
-**CP-3** — The positions above define the conforming advertisement for
-each service. A conformance test can diff the intermediary's relayed
-advertisement against the upstream's raw advertisement and verify that
-exactly the Strip/Refuse/TODO items are absent and the Support items are
-present.
+**CP-3** — The positions above define the conforming advertisement for each service. A conformance test can diff the
+intermediary's relayed advertisement against the upstream's raw advertisement and verify that exactly the
+Strip/Refuse/TODO items are absent and the Support items are present.
 
-**CP-4** — Where a Support-tier capability is absent from the upstream's
-own advertisement, the intersection rule of `01` §5.1 applies: the
-intermediary MUST NOT advertise what the upstream cannot honour.
+**CP-4** — Where a Support-tier capability is absent from the upstream's own advertisement, the intersection rule of
+`01` §5.1 applies: the intermediary MUST NOT advertise what the upstream cannot honour.
 
 ## 7. Open issues
 
-- `push-cert` end-to-end story (the nonce problem above) — the only
-  baseline-adjacent capability that is structurally incompatible with a
-  store-and-forward intermediary as specified.
-- `push-options` as a policy input: relay-and-record vs. strip. If
-  relayed, are options visible to policy rules?
+- `push-cert` end-to-end story (the nonce problem above) — the only baseline-adjacent capability that is structurally
+  incompatible with a store-and-forward intermediary as specified.
+- `push-options` as a policy input: relay-and-record vs. strip. If relayed, are options visible to policy rules?
 - `report-status-v2` semantics review.
-- v2 for push does not exist today; if the Git project ever extends v2 to
-  `receive-pack`, this section needs a new table.
+- v2 for push does not exist today; if the Git project ever extends v2 to `receive-pack`, this section needs a new
+  table.
 
 <details>
 <summary>Internal working note — remove before any publication</summary>
 
 Live advertisement sample, 2026-08-09, github.com (coopernetes/test-repo):
 
-- receive-pack: `report-status report-status-v2 delete-refs
-side-band-64k ofs-delta atomic object-format=sha1 quiet agent=...
-session-id=... push-options`
-- upload-pack v0: `multi_ack thin-pack side-band side-band-64k ofs-delta
-shallow deepen-since deepen-not deepen-relative no-progress
-include-tag multi_ack_detailed allow-tip-sha1-in-want
-allow-reachable-sha1-in-want no-done symref=HEAD:... filter
-object-format=sha1 agent=...`
-- v2: `ls-refs=unborn`, `fetch=shallow wait-for-done filter`,
-  `server-option`, `object-format=sha1`
+- receive-pack:
+  `report-status report-status-v2 delete-refs side-band-64k ofs-delta atomic object-format=sha1 quiet agent=... session-id=... push-options`
+- upload-pack v0:
+  `multi_ack thin-pack side-band side-band-64k ofs-delta shallow deepen-since deepen-not deepen-relative no-progress include-tag multi_ack_detailed allow-tip-sha1-in-want allow-reachable-sha1-in-want no-done symref=HEAD:... filter object-format=sha1 agent=...`
+- v2: `ls-refs=unborn`, `fetch=shallow wait-for-done filter`, `server-option`, `object-format=sha1`
 
-Observations: the §3 baseline Support tier matches the live receive-pack
-advertisement exactly. `push-cert` is NOT advertised — Strip-until-
-resolved costs nothing against this host. `report-status-v2`,
-`push-options`, `session-id` are all live → those TODOs are
-priority-ordered ahead of the others. Both `allow-*-sha1-in-want`
-variants are live on fetch → the §4 strip-unless-reachability-aware rule
-is not theoretical. No `packfile-uris` in either advertisement. No
+Observations: the §3 baseline Support tier matches the live receive-pack advertisement exactly. `push-cert` is NOT
+advertised — Strip-until- resolved costs nothing against this host. `report-status-v2`, `push-options`, `session-id` are
+all live → those TODOs are priority-ordered ahead of the others. Both `allow-*-sha1-in-want` variants are live on fetch
+→ the §4 strip-unless-reachability-aware rule is not theoretical. No `packfile-uris` in either advertisement. No
 `sideband-all`.
 
 </details>
